@@ -1,0 +1,38 @@
+package org.engcia
+ 
+import org.engcia.cf.model.FactCF;
+import org.engcia.cf.model.Evidence;
+import org.engcia.cf.model.Hypothesis;
+import org.engcia.cf.listeners.TrackingAgendaListener;
+
+rule "r1:Fingerprints on the weapon"
+@CF(0.75)
+lock-on-active true
+when
+	Evidence( description == "fingerprints", value == "true" )
+then
+	Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "guilty", "true");
+	$h.update();
+end
+
+rule "r2:Motive"
+@CF(0.60)
+lock-on-active true
+when
+	Evidence( description == "motive", value == "true" )
+then
+	Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "guilty", "true");
+	$h.update();
+end
+
+rule "r3:Alibi"
+@CF(-0.80)
+lock-on-active true
+when
+	Evidence( description == "alibi", value == "true" )
+then
+	Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "guilty", "true");
+	$h.update();
+end
+
+	
