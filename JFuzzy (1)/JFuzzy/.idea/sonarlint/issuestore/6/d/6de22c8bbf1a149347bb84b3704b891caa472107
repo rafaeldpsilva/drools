@@ -1,0 +1,14 @@
+
+U	java:S106<"9Replace this use of System.out or System.err by a logger.(îó¢Ê8‡‹îÜÔ.
+Z	java:S1063"9Replace this use of System.out or System.err by a logger.(šø•‹øÿÿÿÿ8È—İÔ.
+U	java:S106/"9Replace this use of System.out or System.err by a logger.(€äÇ…8ëÍ İÔ.
+]	java:S125"<This block of commented-out lines of code should be removed.(ã™·–øÿÿÿÿ8¤Ì×Ô.
+]	java:S125,"<This block of commented-out lines of code should be removed.(Ø×ú¬øÿÿÿÿ8·¥üÙÔ.
+Z	java:S1069"9Replace this use of System.out or System.err by a logger.(šø•‹øÿÿÿÿ8ÿ…˜İÔ.
+m
+java:S11922"KDefine a constant instead of duplicating this literal "prescricao" 3 times.(ÉœÖüÿÿÿÿ8¼ŞáÜÔ.
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(…ÚÏüÿÿÿÿ8î¦ªÕÔ.
+U	java:S1066"9Replace this use of System.out or System.err by a logger.(îó¢Ê8ÍÒíÜÔ.
+U	java:S106B"9Replace this use of System.out or System.err by a logger.(ÿş«Ä8ŞïµÜÔ.
+U	java:S106@"9Replace this use of System.out or System.err by a logger.(£«Ï•8²ƒŸİÔ.
+U	java:S106)"9Replace this use of System.out or System.err by a logger.(Ò“è¢8·¥üÙÔ.
