@@ -12,7 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <drools-version>7.44.0.Final</drools-version>
+    <drools-version>8.27.0.Beta</drools-version>
     <slf4j-version>1.7.26</slf4j-version>
     <junit-version>4.12</junit-version>
   </properties>
@@ -35,7 +35,16 @@
         <groupId>org.drools</groupId>
         <artifactId>drools-compiler</artifactId>
         <scope>compile</scope>
-      </dependency>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-xml-support</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-mvel</artifactId>
+    </dependency>
+
 
     <dependency>
       <groupId>junit</groupId>
