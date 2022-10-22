@@ -4,12 +4,16 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.engcia.cf.listeners.TrackingAgendaListener;
 
 public class FactCF implements Comparable<FactCF>, Uncertainty {
+	static private int lastId = 0;
+	private int id;
 	private double cf;
 	private String description;
 	private String value;
 
 	public FactCF(double cf, String description, String value) {
 		super();
+		FactCF.lastId ++;
+		this.id = lastId;
 		this.cf = cf;
 		this.description = description;
 		this.value = value;
@@ -17,6 +21,10 @@ public class FactCF implements Comparable<FactCF>, Uncertainty {
 	
 	public FactCF() {
 		this(0, "", "");
+	}
+
+	public int getId() {
+		return this.id;
 	}
 
 	public double getCf() {

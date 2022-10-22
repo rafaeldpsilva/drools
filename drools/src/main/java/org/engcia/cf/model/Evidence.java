@@ -9,5 +9,4 @@ public class Evidence extends FactCF{
 	public String toString() {
 		return super.toString();
 	}
-
 }

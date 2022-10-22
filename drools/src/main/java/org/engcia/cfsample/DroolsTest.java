@@ -1,6 +1,10 @@
 package org.engcia.cfsample;
 
 //import org.drools.core.rule.builder.dialect.asm.ClassGenerator;
+import org.engcia.cf.listeners.TrackingAgendaEventListener;
+import org.engcia.cf.model.Conclusion;
+import org.engcia.cf.model.Justification;
+import org.engcia.view.UI;
 import org.kie.api.KieServices;
 //import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.KieContainer;
@@ -9,35 +13,75 @@ import org.engcia.cf.listeners.TrackingAgendaListener;
 import org.engcia.cf.model.Hypothesis;
 import org.engcia.cf.model.Evidence;
 import org.engcia.cf.listeners.FactListener;
+import org.kie.api.runtime.rule.LiveQuery;
+import org.kie.api.runtime.rule.Row;
+import org.kie.api.runtime.rule.ViewChangedEventListener;
+
+import java.io.BufferedReader;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
  * This is a sample class to launch a rule.
  */
 public class DroolsTest {
+    public static KieSession KS;
+    public static BufferedReader BR;
+    public static TrackingAgendaEventListener agendaEventListener;
+    public static Map<Integer, Justification> justifications;
 
     public static final void main(String[] args) {
-        try {
-            // load up the knowledge base
-	        KieServices ks = KieServices.Factory.get();
-    	    KieContainer kContainer = ks.getKieClasspathContainer();
-        	KieSession kSession = kContainer.newKieSession("ksession-rules");
-        	
-        	// Agenda listener
-        	kSession.addEventListener(new TrackingAgendaListener());
-        	
-        	// Facts listener
-        	kSession.addEventListener(new FactListener());
+        UI.uiInit();
+        runEngine();
+        UI.uiClose();
+    }
 
-            // go !
-            
-            kSession.insert(new Hypothesis(0.0, "guilty", "true"));
-            kSession.insert(new Evidence(0.90, "fingerprints", "true"));
-            kSession.insert(new Evidence(0.50, "motive", "true"));
-            kSession.insert(new Evidence(0.95, "alibi", "true"));
-            
+    public static void runEngine() {
+        try {
+            DroolsTest.justifications = new TreeMap<Integer, Justification>();
+
+            // load up the knowledge base
+            KieServices ks = KieServices.Factory.get();
+            KieContainer kContainer = ks.getKieClasspathContainer();
+            final KieSession kSession = kContainer.newKieSession("ksession-rules");
+            DroolsTest.KS = kSession;
+            DroolsTest.agendaEventListener = new TrackingAgendaEventListener();
+            kSession.addEventListener(agendaEventListener);
+
+            // Query listener
+            ViewChangedEventListener listener = new ViewChangedEventListener() {
+                @Override
+                public void rowDeleted(Row row) {
+                }
+
+                @Override
+                public void rowInserted(Row row) {
+                    Conclusion conclusion = (Conclusion) row.get("$conclusion");
+                    System.out.println(">>>" + conclusion.toString());
+
+                    //System.out.println(DroolsTest.justifications);
+                    How how = new How(DroolsTest.justifications);
+                    System.out.println(how.getHowExplanation(conclusion.getId()));
+
+                    // stop inference engine after as soon as got a conclusion
+                    kSession.halt();
+
+                }
+
+                @Override
+                public void rowUpdated(Row row) {
+                }
+
+            };
+
+            LiveQuery query = kSession.openLiveQuery("Conclusions", null, listener);
+
             kSession.fireAllRules();
-            
+            // kSession.fireUntilHalt();
+
+            query.close();
+
         } catch (Throwable t) {
             t.printStackTrace();
         }

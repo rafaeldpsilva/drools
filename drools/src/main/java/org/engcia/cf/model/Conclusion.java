@@ -1,6 +1,6 @@
 package org.engcia.cf.model;
 
-public class Conclusion {
+public class Conclusion extends FactCF{
     public static final String CHARGE_BATTERY = "Charge Battery";
     public static final String SELL_TO_COMMUNITY = "Sell to the community market";
     public static final String SEND_GRID = "Send to the grid";
