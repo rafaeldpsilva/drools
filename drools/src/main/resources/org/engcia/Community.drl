@@ -10,6 +10,7 @@ rule "r1: IF R > 1 THEN h(Sufficiently Charged Battery) - Atual - Limite Suficie
     when
         Evidence( description== "R", value == "greater")
     then
+        //sufficiently charged battery?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
         $h.update();
 end
@@ -18,6 +19,7 @@ rule "r2: IF R <= 1 THEN h(Participants With Surplus) - Margem entre consumo e p
     when
         Evidence(description == "R", value == "equal or less")
     then
+        //participants with surplus?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
         $h.update();
 end
@@ -27,6 +29,7 @@ rule "r3: IF R > 1 AND Sufficiently Charged Battery THEN h(Community Demand) -"
         Hypothesis(description == "R")
         Evidence(description == "Sufficiently Charged Battery", value == "True")
     then
+        //sufficiently charged battery?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
         $h.update();
 end
@@ -36,6 +39,7 @@ rule "r4: IF R > 1 AND ~Sufficiently Charged Battery THEN h(Predicted Energy Sca
         Hypothesis(description == "R")
         Evidence(description == "Sufficiently Charged Battery", value == "False")
     then
+        //participants with surplus?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
         $h.update();
 end
@@ -54,6 +58,7 @@ rule "r6: IF R > 1 AND ~Predicted Energy Scarcity THEN h(Expensive Hour)"
         Hypothesis(description == "R")
         Evidence(description == "Predicted Energy Scarcity", value == "False")
     then
+        //expensive hour?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "expensive hour", "true");
         $h.update();
 end
@@ -63,6 +68,7 @@ rule "r7: IF R > 1 AND Expensive Hour THEN Community Demand"
         Hypothesis(description == "R")
         Evidence(description == "Expensive Hour", value == "True")
     then
+        //community demand?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "community demand", "true");
         $h.update();
 end
@@ -114,6 +120,7 @@ rule "r13: IF ~Participant with surplus THEN Predicted Energy Scarcity"
     when
         Evidence(description == "Participants with surplus", value == "False")
     then
+        //participants with surplus?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
         $h.update();
 end
