@@ -2,11 +2,11 @@ package org.engcia.cf.model;
 
 public class Participant {
 
-    public String id;
+    private String id;
 
-    public double consumption;
+    private double consumption;
 
-    public double production;
+    private double production;
 
     public Participant(String id, double consumption, double production){
         this.id = id;
@@ -18,4 +18,15 @@ public class Participant {
         return this.production/this.consumption;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public double getConsumption() {
+        return consumption;
+    }
+
+    public double getProduction() {
+        return production;
+    }
 }
