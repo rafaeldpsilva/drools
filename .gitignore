@@ -1,0 +1,5 @@
+/drools/.idea/*
+/drools/target/
+.idea/
+
+/drools/*.iml
