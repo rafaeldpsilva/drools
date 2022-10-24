@@ -4,11 +4,15 @@ import org.engcia.cf.model.FactCF;
 import org.engcia.cf.model.Evidence;
 import org.engcia.cf.model.Hypothesis;
 import org.engcia.cf.model.Conclusion;
-import org.engcia.cf.listeners.TrackingAgendaListener;
+import org.engcia.cf.listeners.TrackingAgendaListener
+import org.engcia.model.Hypothesis
+import org.engcia.model.Conclusion
+import org.engcia.model.drools.Conclusion
+import org.engcia.model.drools.Hypothesis;
 
 rule "r1: IF R > 1 THEN h(Sufficiently Charged Battery) - Atual - Limite Suficiente"
     when
-        Evidence( description== "R", value == "greater")
+        Evidence(description== "R", value == "greater")
     then
         //sufficiently charged battery?
         Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
@@ -27,10 +31,10 @@ end
 rule "r3: IF R > 1 AND Sufficiently Charged Battery THEN h(Community Demand) -"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Sufficiently Charged Battery", value == "True")
+        Hypothesis(description == "sufficiently charged battery", value == "true")
     then
         //sufficiently charged battery?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
+        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "community demand", "true");
         $h.update();
 end
 

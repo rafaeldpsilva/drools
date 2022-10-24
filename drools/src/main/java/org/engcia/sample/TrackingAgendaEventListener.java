@@ -1,26 +1,28 @@
-package org.engcia.cf.listeners;
-
-import org.drools.core.event.DefaultAgendaEventListener;
-import org.engcia.cf.model.FactCF;
-import org.engcia.cf.model.Justification;
-import org.engcia.cfsample.DroolsTest;
-import org.kie.api.definition.rule.Rule;
-import org.kie.api.event.rule.*;
-import org.kie.api.runtime.rule.Match;
+package org.engcia.sample;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrackingAgendaEventListener extends DefaultAgendaEventListener {
+import org.drools.core.event.DefaultAgendaEventListener;
+import org.engcia.sample.DroolsTest;
+import org.kie.api.definition.rule.Rule;
+import org.kie.api.event.rule.*;
+import org.kie.api.runtime.rule.Match;
+
+import org.engcia.model.drools.Fact;
+import org.engcia.model.drools.Justification;
+
+@SuppressWarnings("restriction")
+public class TrackingAgendaEventListener extends DefaultAgendaEventListener{
     private List<Match> matchList = new ArrayList<Match>();
-    private List<FactCF> lhs = new ArrayList<FactCF>();
-    private List<FactCF> rhs = new ArrayList<FactCF>();
+    private List<Fact> lhs = new ArrayList<Fact>();
+    private List<Fact> rhs = new ArrayList<Fact>();
 
     public void resetLhs() {
         lhs.clear();
     }
 
-    public void addLhs(FactCF f) {
+    public void addLhs(Fact f) {
         lhs.add(f);
     }
 
@@ -28,7 +30,7 @@ public class TrackingAgendaEventListener extends DefaultAgendaEventListener {
         rhs.clear();
     }
 
-    public void addRhs(FactCF f) {
+    public void addRhs(Fact f) {
         rhs.add(f);
     }
 
@@ -55,19 +57,19 @@ public class TrackingAgendaEventListener extends DefaultAgendaEventListener {
         //System.out.println("LHS:");
         List <Object> list = event.getMatch().getObjects();
         for (Object e : list) {
-            if (e instanceof FactCF) {
-                lhs.add((FactCF)e);
+            if (e instanceof Fact) {
+                lhs.add((Fact)e);
             }
         }
 
         /*
-        for (FactCF f : lhs) {
+        for (Fact f : lhs) {
             //System.out.println(f.getId() + ":" + f);
         }
         */
 
         //System.out.println("RHS:");
-        for (FactCF f: rhs) {
+        for (Fact f: rhs) {
             //System.out.println(f.getId() + ":" + f);
             Justification j = new Justification(ruleName, lhs, f);
             DroolsTest.justifications.put(f.getId(), j);
@@ -91,4 +93,3 @@ public class TrackingAgendaEventListener extends DefaultAgendaEventListener {
         //System.out.println(sb.toString());
     }
 }
-

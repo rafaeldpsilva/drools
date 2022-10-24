@@ -1,8 +1,8 @@
-package org.engcia.cfsample;
+package org.engcia.sample;
 
-import org.engcia.cf.model.FactCF;
-import org.engcia.cf.model.Hypothesis;
-import org.engcia.cf.model.Justification;
+import org.engcia.model.drools.Fact;
+import org.engcia.model.drools.Hypothesis;
+import org.engcia.model.drools.Justification;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class How {
             sb.append(j.getConclusion() + " was obtained by rule " + j.getRuleName() + " because");
             sb.append('\n');
             int l = level + 1;
-            for (FactCF f : j.getLhs()) {
+            for (Fact f : j.getLhs()) {
                 sb.append(getIdentation(l));
                 sb.append(f);
                 sb.append('\n');
@@ -47,4 +47,3 @@ public class How {
         return sb.toString();
     }
 }
-

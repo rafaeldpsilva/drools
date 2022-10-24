@@ -1,6 +1,6 @@
-package org.engcia.cf.model;
+package org.engcia.model.drools;
 
-public class Conclusion extends FactCF{
+public class Conclusion extends Fact{
     public static final String CHARGE_BATTERY = "Charge Battery";
     public static final String SELL_TO_COMMUNITY = "Sell to the community market";
     public static final String SEND_GRID = "Send to the grid";
@@ -18,10 +18,6 @@ public class Conclusion extends FactCF{
 
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String toString() {

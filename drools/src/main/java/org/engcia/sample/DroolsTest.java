@@ -1,18 +1,13 @@
-package org.engcia.cfsample;
+package org.engcia.sample;
 
 //import org.drools.core.rule.builder.dialect.asm.ClassGenerator;
-import org.engcia.cf.listeners.TrackingAgendaEventListener;
-import org.engcia.cf.model.Conclusion;
-import org.engcia.cf.model.Justification;
+import org.engcia.model.drools.Conclusion;
+import org.engcia.model.drools.Justification;
 import org.engcia.view.UI;
 import org.kie.api.KieServices;
 //import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.engcia.cf.listeners.TrackingAgendaListener;
-import org.engcia.cf.model.Hypothesis;
-import org.engcia.cf.model.Evidence;
-import org.engcia.cf.listeners.FactListener;
 import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.Row;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
@@ -37,14 +32,14 @@ public class DroolsTest {
         UI.uiClose();
     }
 
-    public static void runEngine() {
+    private static void runEngine() {
         try {
             DroolsTest.justifications = new TreeMap<Integer, Justification>();
 
             // load up the knowledge base
             KieServices ks = KieServices.Factory.get();
             KieContainer kContainer = ks.getKieClasspathContainer();
-            final KieSession kSession = kContainer.newKieSession("ksession-rules");
+            final KieSession kSession = kContainer.newKieSession("community-rules");
             DroolsTest.KS = kSession;
             DroolsTest.agendaEventListener = new TrackingAgendaEventListener();
             kSession.addEventListener(agendaEventListener);
@@ -86,5 +81,4 @@ public class DroolsTest {
             t.printStackTrace();
         }
     }
-
 }

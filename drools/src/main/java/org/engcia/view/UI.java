@@ -1,7 +1,7 @@
 package org.engcia.view;
 
-import org.engcia.cf.model.Evidence;
-import org.engcia.cfsample.DroolsTest;
+import org.engcia.model.drools.Evidence;
+import org.engcia.sample.DroolsTest;
 import org.kie.api.runtime.ClassObjectFilter;
 
 import java.io.BufferedReader;
@@ -32,7 +32,7 @@ public class UI {
         boolean questionFound = false;
         Evidence evidence = null;
         for (Evidence e: evidences) {
-            if (e.getDescription().compareTo(ev) == 0) {
+            if (e.getEvidence().compareTo(ev) == 0) {
                 questionFound = true;
                 evidence = e;
                 break;
@@ -51,7 +51,7 @@ public class UI {
         System.out.print(ev + "? ");
         String value = readLine();
 
-        Evidence e = new Evidence(1, ev, value);
+        Evidence e = new Evidence(ev, value);
         DroolsTest.KS.insert(e);
 
         if (value.compareTo(v) == 0) {
