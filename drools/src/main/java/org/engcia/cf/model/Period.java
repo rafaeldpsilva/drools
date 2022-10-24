@@ -2,13 +2,15 @@ package org.engcia.cf.model;
 
 import java.util.List;
 
-public class Community {
+public class Period {
 
+    private String datetimePeriod;
     private List<Participant> participants;
-
+    Weather weather;
     private List<Battery> batteries;
+    Pricing pricing;
 
-    public Community(List<Participant> participants, List<Battery> batteries) {
+    public Period(List<Participant> participants, List<Battery> batteries) {
         this.participants = participants;
         this.batteries = batteries;
     }
