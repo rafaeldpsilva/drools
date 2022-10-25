@@ -1,161 +1,166 @@
 package org.engcia;
 
-import org.engcia.cf.model.FactCF;
-import org.engcia.cf.model.Evidence;
-import org.engcia.cf.model.Hypothesis;
-import org.engcia.cf.model.Conclusion;
-import org.engcia.cf.listeners.TrackingAgendaListener;
+import org.engcia.model.drools.Evidence;
+import org.engcia.model.drools.Hypothesis;
+import org.engcia.model.drools.Conclusion;
+import org.engcia.model.drools.Fact;
 
-rule "r1: IF R > 1 THEN h(Sufficiently Charged Battery) - Atual - Limite Suficiente"
+import function org.engcia.view.UI.answer;
+
+query "Conclusions"
+	$conclusion : Conclusion()
+end
+
+rule "R1: Ratio greather than 1"
     when
-        Evidence( description== "R", value == "greater")
+        Evidence(evidence == "R", value == "greater")
     then
         //sufficiently charged battery?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("sufficiently charged battery", "true");
+        insert(h);
 end
 
-rule "r2: IF R <= 1 THEN h(Participants With Surplus) - Margem entre consumo e produção"
+rule "R2: Ratio equal or less than 1"
     when
-        Evidence(description == "R", value == "equal or less")
+        Evidence(evidence == "R", value == "equal or less")
     then
         //participants with surplus?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("participants with surplus", "true");
+        insert(h);
 end
 
-rule "r3: IF R > 1 AND Sufficiently Charged Battery THEN h(Community Demand) -"
+rule "R3: Ratio greater than 1 and Sufficiently Charged Batteries"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Sufficiently Charged Battery", value == "True")
+        Hypothesis(description == "sufficiently charged battery", value == "true")
     then
         //sufficiently charged battery?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "sufficiently charged battery", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("community demand", "true");
+        insert(h);
 end
 
-rule "r4: IF R > 1 AND ~Sufficiently Charged Battery THEN h(Predicted Energy Scarcity)"
+rule "R4: Ratio greater than 1 and Not Sufficiently Charged Batteries"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Sufficiently Charged Battery", value == "False")
+        Evidence(evidence == "Sufficiently Charged Battery", value == "False")
     then
         //participants with surplus?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("participants with surplus", "true");
+        insert(h);
 end
 
-rule "r5: IF R > 1 AND Predicted Energy Scarcity THEN CHARGE BATTERY"
+rule "R5: Ratio greater than 1 and Predicted Energy Scarcity"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Predicted Energy Scarcity", value == "True")
+        Evidence(evidence == "Predicted Energy Scarcity", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.CHARGE_BATTERY);
         insert(c);
 end
 
-rule "r6: IF R > 1 AND ~Predicted Energy Scarcity THEN h(Expensive Hour)"
+rule "R6: Ratio greater than 1 and not Predicted Energy Scarcity"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Predicted Energy Scarcity", value == "False")
+        Evidence(evidence == "Predicted Energy Scarcity", value == "False")
     then
         //expensive hour?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "expensive hour", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("expensive hour", "true");
+        insert(h);
 end
 
-rule "r7: IF R > 1 AND Expensive Hour THEN Community Demand"
+rule "R7: Ratio greater than 1 and Expensive Hour"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Expensive Hour", value == "True")
+        Evidence(evidence == "expensive hour", value == "True")
     then
         //community demand?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "community demand", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("community demand", "true");
+        insert(h);
 end
 
-rule "r8: IF R > 1 AND ~Expensive Hour THEN Charge Battery"
+rule "R8: Ratio greater than 1 and not Expensive Hour"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Expensive Hour", value == "False")
+        Evidence(evidence == "Expensive Hour", value == "False")
     then
         Conclusion c = new Conclusion(Conclusion.CHARGE_BATTERY);
         insert(c);
 end
 
-rule "r9: IF Community Demand THEN Sell to the local community market"
+rule "R9: Ratio greater than 1 and Community Demand"
     when
         Hypothesis(description == "R")
-        Evidence(description == "Predicted Energy Scarcity", value == "True")
+        Evidence(evidence == "Predicted Energy Scarcity", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.SELL_TO_COMMUNITY);
         insert(c);
 end
 
 
-rule "r10: IF External market demand THEN Sell to the external market"
+rule "R10: External market demand"
     when
-        Evidence(description == "External market demand", value == "True")
+        Evidence(evidence == "External market demand", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.SELL_EXTERNAL);
         insert(c);
 end
 
-rule "r11: IF ~External market demand THEN Send to the grid"
+rule "R11: Not External market"
     when
-        Evidence(description == "External market demand", value == "False")
+        Evidence(evidence == "External market demand", value == "False")
     then
         Conclusion c = new Conclusion(Conclusion.SEND_GRID);
         insert(c);
 end
 
-rule "r12: IF Participants with surplus THEN Balance R using community market"
+rule "R12: Participants with surplus"
     when
-        Evidence(description == "Participants with surplus", value == "True")
+        Evidence(evidence == "Participants with surplus", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.BALANCE_R);
         insert(c);
 end
 
-rule "r13: IF ~Participant with surplus THEN Predicted Energy Scarcity"
+rule "R13: Not Participant with surplus"
     when
-        Evidence(description == "Participants with surplus", value == "False")
+        Evidence(evidence == "Participants with surplus", value == "False")
     then
         //participants with surplus?
-        Hypothesis $h = (Hypothesis)TrackingAgendaListener.getFactRef(Hypothesis.class, "participants with surplus", "true");
-        $h.update();
+        Hypothesis h = new Hypothesis("participants with surplus", "true");
+        insert(h);
 end
 
-rule "r14: IF ~Participant with surplus AND Predicted Energy Scarcity THEN BUY"
+rule "R14: Not Participant with surplus AND Predicted Energy Scarcity"
     when
         Hypothesis(description == "Participants with surplus")
-        Evidence(description == "Predicted Energy Scarcity", value == "True")
+        Evidence(evidence == "Predicted Energy Scarcity", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.BUY_EXTERNAL);
         insert(c);
 end
 
-rule "r15: IF ~Participant with surplus AND ~Expensive Hour THEN Buy"
+rule "R15: Not Participant with surplus AND not Expensive Hour"
     when
         Hypothesis(description == "Participants with surplus")
-        Evidence(description == "Expensive Hour", value == "False")
+        Evidence(evidence == "Expensive Hour", value == "False")
     then
         Conclusion c = new Conclusion(Conclusion.BUY_EXTERNAL);
         insert(c);
 end
 
-rule "r16: IF ~Participant with surplus AND ~Sufficiently Charged Battery THEN Buy"
+rule "R16: Not Participant with surplus AND not Sufficiently Charged Battery"
     when
         Hypothesis(description == "Participants with surplus")
-        Evidence(description == "Sufficiently Charged Battery", value == "False")
+        Evidence(evidence == "Sufficiently Charged Battery", value == "False")
     then
         Conclusion c = new Conclusion(Conclusion.BUY_EXTERNAL);
         insert(c);
 end
 
-rule "r17: IF Participants with surplus AND Sufficient THEN Use Battery's Energy"
+rule "R17: Participants with surplus AND Sufficient Charged Battery"
     when
         Hypothesis(description == "Participants with surplus")
-        Evidence(description == "Sufficiently Charged Battery", value == "True")
+        Evidence(evidence == "Sufficiently Charged Battery", value == "True")
     then
         Conclusion c = new Conclusion(Conclusion.USE_BATTERY);
         insert(c);

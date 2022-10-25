@@ -1,4 +1,4 @@
-package org.engcia.cf.model;
+package org.engcia.model;
 
 import java.util.List;
 

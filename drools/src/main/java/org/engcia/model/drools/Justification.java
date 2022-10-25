@@ -1,16 +1,16 @@
-package org.engcia.cf.model;
+package org.engcia.model.drools;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Justification {
     private String rule;
-    private List<FactCF> lhs;
-    private FactCF conclusion;
+    private List<Fact> lhs;
+    private Fact conclusion;
 
-    public Justification(String rule, List<FactCF> lhs, FactCF conclusion) {
+    public Justification(String rule, List<Fact> lhs, Fact conclusion) {
         this.rule = rule;
-        this.lhs = new ArrayList<FactCF>(lhs);
+        this.lhs = new ArrayList<Fact>(lhs);
         this.conclusion = conclusion;
     }
 
@@ -18,12 +18,11 @@ public class Justification {
         return this.rule;
     }
 
-    public List<FactCF> getLhs() {
+    public List<Fact> getLhs() {
         return this.lhs;
     }
 
-    public FactCF getConclusion() {
+    public Fact getConclusion() {
         return this.conclusion;
     }
 }
-
