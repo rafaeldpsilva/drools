@@ -1,4 +1,4 @@
-package org.engcia.model.drools;
+package org.engcia.model;
 
 import org.engcia.sample.DroolsTest;
 

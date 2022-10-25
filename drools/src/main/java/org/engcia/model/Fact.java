@@ -1,4 +1,4 @@
-package org.engcia.model.drools;
+package org.engcia.model;
 
 public class Fact {
 	static private int lastId = 0;

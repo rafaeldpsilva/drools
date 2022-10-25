@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.core.event.DefaultAgendaEventListener;
-import org.engcia.sample.DroolsTest;
 import org.kie.api.definition.rule.Rule;
 import org.kie.api.event.rule.*;
 import org.kie.api.runtime.rule.Match;
 
-import org.engcia.model.drools.Fact;
-import org.engcia.model.drools.Justification;
+import org.engcia.model.Fact;
+import org.engcia.model.Justification;
 
 @SuppressWarnings("restriction")
 public class TrackingAgendaEventListener extends DefaultAgendaEventListener{

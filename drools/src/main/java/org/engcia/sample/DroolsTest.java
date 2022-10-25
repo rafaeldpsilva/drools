@@ -1,11 +1,11 @@
 package org.engcia.sample;
 
 //import org.drools.core.rule.builder.dialect.asm.ClassGenerator;
-import org.engcia.model.drools.Conclusion;
-import org.engcia.model.drools.Justification;
+
+import org.engcia.model.Conclusion;
+import org.engcia.model.Justification;
 import org.engcia.view.UI;
 import org.kie.api.KieServices;
-//import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.LiveQuery;

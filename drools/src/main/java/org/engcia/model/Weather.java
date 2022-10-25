@@ -1,4 +1,4 @@
-package org.engcia.cf.model;
+package org.engcia.model;
 
 public class Weather {
     private Double temperatureC;

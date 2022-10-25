@@ -1,9 +1,9 @@
 package org.engcia;
 
-import org.engcia.model.drools.Evidence;
-import org.engcia.model.drools.Hypothesis;
-import org.engcia.model.drools.Conclusion;
-import org.engcia.model.drools.Fact;
+import org.engcia.model.Evidence;
+import org.engcia.model.Hypothesis;
+import org.engcia.model.Conclusion;
+import org.engcia.model.Fact;
 
 import function org.engcia.view.UI.answer;
 

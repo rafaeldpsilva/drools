@@ -1,4 +1,4 @@
-package org.engcia.model.drools;
+package org.engcia.model;
 
 public class Conclusion extends Fact{
     public static final String CHARGE_BATTERY = "Charge Battery";

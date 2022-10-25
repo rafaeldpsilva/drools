@@ -1,4 +1,4 @@
-package org.engcia.model.drools;
+package org.engcia.model;
 
 import java.util.ArrayList;
 import java.util.List;

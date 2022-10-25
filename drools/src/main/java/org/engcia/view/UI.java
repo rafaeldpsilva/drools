@@ -1,6 +1,6 @@
 package org.engcia.view;
 
-import org.engcia.model.drools.Evidence;
+import org.engcia.model.Evidence;
 import org.engcia.sample.DroolsTest;
 import org.kie.api.runtime.ClassObjectFilter;
 

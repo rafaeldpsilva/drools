@@ -1,8 +1,8 @@
 package org.engcia.sample;
 
-import org.engcia.model.drools.Fact;
-import org.engcia.model.drools.Hypothesis;
-import org.engcia.model.drools.Justification;
+import org.engcia.model.Fact;
+import org.engcia.model.Hypothesis;
+import org.engcia.model.Justification;
 
 import java.util.Map;
 
