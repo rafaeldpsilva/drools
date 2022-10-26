@@ -95,8 +95,6 @@ rule "R8.1: Ratio greater than 1 and not PES and Community Demand"
         insert(c);
 end
 
-
-
 rule "R8.2: Ratio greater than 1 and not PES and not Community Demand"
     when
         Hypothesis(description == "R", value == "greater")
