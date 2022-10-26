@@ -13,7 +13,7 @@ end
 
 rule "R1: Ratio greater than 1"
     when
-        eval(answer("Ratio greater than 1", value == "yes"))
+        eval(answer("Ratio greater than 1", "yes"))
     then
         Hypothesis h = new Hypothesis("R", "greater");
         insert(h);
@@ -21,7 +21,7 @@ end
 
 rule "R2: Ratio equal or less than 1"
     when
-        eval(answer("Ratio greater than 1", value == "no"))
+        eval(answer("Ratio greater than 1", "no"))
     then
         Hypothesis h = new Hypothesis("R", "equal or less");
         insert(h);
@@ -38,8 +38,8 @@ end
 
 rule "R4: Ratio greater than 1 and Not Predicted Energy Scarcity"
     when
-        Hypothesis(description == "R", value == "equal or less")
-        Evidence(evidence == "predicted energy scarcity", value == "no")
+        Hypothesis(description == "R", value == "greater")
+        eval(answer("predicted energy scarcity", "no"))
     then
         Hypothesis h = new Hypothesis("predicted energy scarcity", "false");
         insert(h);
@@ -49,7 +49,7 @@ rule "R5: Ratio greater than 1 and PES and Battery Sufficiently Charged"
     when
         Hypothesis(description == "R", value == "greater")
         Hypothesis(description == "predicted energy scarcity", value == "true")
-        eval(answer("battery sufficiently charged", "yes"))
+        eval(answer("battery sufficiently charged", "no"))
     then
         Conclusion c = new Conclusion(Conclusion.CHARGE_BATTERY);
         insert(c);
@@ -59,9 +59,9 @@ rule "R6: Ratio greater than 1 and PES and Not Battery Sufficiently Charged"
     when
         Hypothesis(description == "R", value == "greater")
         Hypothesis(description == "predicted energy scarcity", value == "true")
-        eval(answer("battery sufficiently charged", "no"))
+        eval(answer("battery sufficiently charged", "yes"))
     then
-        Hypothesis h = new Hypothesis("battery sufficiently charged", "false");
+        Hypothesis h = new Hypothesis("battery sufficiently charged", "true");
         insert(h);
 end
 
@@ -71,21 +71,11 @@ rule "R7.1: Ratio greater than 1 and Battery Sufficiently Charged and Community 
         Hypothesis(description == "battery sufficiently charged", value == "true")
         eval(answer("community demand", "yes"))
     then
-        Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY);
+        Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY_MARKET);
         insert(c);
 end
 
-rule "R7.2: Ratio greater than 1 and not PES and Community Demand"
-    when
-        Hypothesis(description == "R", value == "greater")
-        Hypothesis(description == "predicted energy scarcity", value == "false")
-        eval(answer("community demand", "yes"))
-    then
-        Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY);
-        insert(c);
-end
-
-rule "R8.1: Ratio greater than 1 and Battery Sufficiently Charged and not Community Demand"
+rule "R7.2: Ratio greater than 1 and Battery Sufficiently Charged and not Community Demand"
     when
         Hypothesis(description == "R", value == "greater")
         Hypothesis(description == "battery sufficiently charged", value == "true")
@@ -94,6 +84,18 @@ rule "R8.1: Ratio greater than 1 and Battery Sufficiently Charged and not Commun
         Hypothesis h = new Hypothesis("community demand", "false");
         insert(h);
 end
+
+rule "R8.1: Ratio greater than 1 and not PES and Community Demand"
+    when
+        Hypothesis(description == "R", value == "greater")
+        Hypothesis(description == "predicted energy scarcity", value == "false")
+        eval(answer("community demand", "yes"))
+    then
+        Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY_MARKET);
+        insert(c);
+end
+
+
 
 rule "R8.2: Ratio greater than 1 and not PES and not Community Demand"
     when
@@ -105,20 +107,20 @@ rule "R8.2: Ratio greater than 1 and not PES and not Community Demand"
         insert(h);
 end
 
-rule "R9: Ratio greater than 1 and Community Demand and External Market Demand"
+rule "R9: Ratio greater than 1 and Not Community Demand and External Market Demand"
     when
         Hypothesis(description == "R", value == "greater")
-        Hypothesis(description == "community demand", value == "true")
+        Hypothesis(description == "community demand", value == "false")
         eval(answer("external market demand", "yes"))
     then
         Conclusion c = new Conclusion(Conclusion.SELL_EXTERNAL_MARKET);
         insert(c);
 end
 
-rule "R10: Ratio greater than 1 and Community Demand and External Market Demand"
+rule "R10: Ratio greater than 1 and Not Community Demand and External Market Demand"
     when
         Hypothesis(description == "R", value == "greater")
-        Hypothesis(description == "community demand", value == "true")
+        Hypothesis(description == "community demand", value == "false")
         eval(answer("external market demand", "no"))
     then
         Conclusion c = new Conclusion(Conclusion.SEND_GRID);
@@ -172,7 +174,17 @@ rule "R15.1: Not Currently in Energy Scarcity and no Participant with surplus"
         insert(h);
 end
 
-rule "R15.2: Batteries are not charged and no Participant with surplus"
+rule "R15.2: Not Currently in Energy Scarcity and Participant with surplus"
+    when
+        Hypothesis(description == "currently in energy scarcity", value == "false")
+        eval(answer("participants with surplus", "yes"))
+    then
+        Conclusion c = new Conclusion(Conclusion.BALANCE_R);
+        insert(c);
+end
+
+
+rule "R16.1: Batteries are not charged and no Participant with surplus"
     when
         Hypothesis(description == "batteries are charged", value == "false")
         eval(answer("participants with surplus", "no"))
@@ -181,19 +193,10 @@ rule "R15.2: Batteries are not charged and no Participant with surplus"
         insert(h);
 end
 
-rule "R16.1: Not Currently in Energy Scarcity and Participant with surplus"
-    when
-        Hypothesis(description == "currently in energy scarcity", value == "false")
-        eval(answer("participants with surplus", "no"))
-    then
-        Conclusion c = new Conclusion(Conclusion.BALANCE_R);
-        insert(c);
-end
-
 rule "R16.2: Batteries are not charged and Participant with surplus"
     when
         Hypothesis(description == "batteries are charged", value == "false")
-        eval(answer("participants with surplus", "no"))
+        eval(answer("participants with surplus", "yes"))
     then
         Conclusion c = new Conclusion(Conclusion.BALANCE_R);
         insert(c);
