@@ -265,9 +265,14 @@ formata(Nivel):-
 % calcula_consumo([],0):-!.
 % calcula_consumo([H|T],R):-calcula_consumo(T,R1), R is H + R1.
 
-% combine(E, LR):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),write('\ndevices\n'),write(D),
-% 			findall(X,combinations(D,E,X),LR),write(LR).
+% combine(E, LR):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOne(LR,D1,LR1).
 
-% combinations([_],0, []):-!.
+% makecombinations([], _,[]).
+% makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
+% combinations(_,0, []):-!.
 % combinations([],_, []):-!.
 % combinations([device(N,X)|T],E, [device(N,X)|R]):-E>0, E1 is E-X, E1>=0, combinations(T,E1,R).
+% checkOneOne(LR,[], LR):-!.
+% checkOneOne(LR,[H|T],L):-member(H,LR),checkOneOne(LR,T,L).
+% checkOneOne(LR,[H|T], [H|L]):-checkOneOne(LR,T,L).
+% devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0))),D).
