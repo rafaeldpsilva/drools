@@ -3,5 +3,7 @@
   <kbase name="community-rules" packages="org.engcia">
     <ksession name="community-rules"/>
   </kbase>
-
+  <kbase name="participant-rules" packages="org.engcia">
+    <ksession name="participant-rules"/>
+  </kbase>
 </kmodule>
