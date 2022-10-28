@@ -9,6 +9,11 @@ public class Conclusion extends Fact{
     public static final String SELL_EXTERNAL_MARKET = "Sell to the external market";
     public static final String BALANCE_R = "Balance R";
     public static final String ADJUST_THRESHOLD = "ADJUST_THRESHOLD";
+    public static final String SHIFT_LOAD = "Shift load to essential consumption";
+    public static final String BUY_CHEAPEST_MARKET = "Buy from the cheapest market";
+    public static final String KEEP_BUYING = "Keep buying energy";
+    public static final String IMPROVE_R = "Improve Ratio (Produciton/Consumption)";
+    public static final String NO_OPERATION_NEEDED = "No operation needed";
 
     private String description;
 

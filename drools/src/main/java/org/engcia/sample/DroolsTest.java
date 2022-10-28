@@ -39,7 +39,7 @@ public class DroolsTest {
             // load up the knowledge base
             KieServices ks = KieServices.Factory.get();
             KieContainer kContainer = ks.getKieClasspathContainer();
-            final KieSession kSession = kContainer.newKieSession("community-rules");
+            final KieSession kSession = kContainer.newKieSession("participant-rules");
             DroolsTest.KS = kSession;
             DroolsTest.agendaEventListener = new TrackingAgendaEventListener();
             kSession.addEventListener(agendaEventListener);
