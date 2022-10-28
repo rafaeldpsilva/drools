@@ -19,11 +19,16 @@ carrega_bc:-
 
 tenergai:-calculos, arranca_motor.
 
-calculos:-retract(ultimo_facto(X1)),write(nl),write(X1),
+calculos:- cria_facto_consumo,
+			calcular_ratio.
+	
+calcular_ratio:-retract(ultimo_facto(X1)),write(nl),write(X1),
 	X is X1+1,
+	facto(_,production(_,Prod)),
+	facto(_,facto_total_consumo(TotalConsum)),
+	Ratio is Prod / TotalConsum,
 	asserta(ultimo_facto(X)),
-	assertz(facto(X,(ratio(this_period,9)))),
-	cria_facto_consumo.
+	assertz(facto(X,(ratio(this_period,Ratio)))).
 
 arranca_motor:-
 	facto(N,Facto),

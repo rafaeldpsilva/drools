@@ -4,8 +4,8 @@
 % Metaconhecimento
 
 facto_dispara_regras(usertype(individual), [1]).
+facto_dispara_regras(ratio(this_period,_), [1,2,3]).
 % facto_dispara_regras(usertype(community), [1, 3, 8]).
-
 % facto_dispara_regras(tipo(_, mercadorias), [2, 8]).
 % facto_dispara_regras(tipo(_, misto), [4]).
 % facto_dispara_regras(lota��o(_, _), [5, 7]).
@@ -18,9 +18,21 @@ facto_dispara_regras(usertype(individual), [1]).
 ultimo_facto(21).
 ultima_regra(1).
 
+
+% Ratio superior a 1
 regra 1
-	se [avalia(ratio(this_period,<,10))]
-	entao [cria_facto(production(this_period, 8))].
+	se [avalia(ratio(this_period,>,1))]
+	entao [cria_facto(ratio_more_than_one(this_period,1))].
+
+% Ratio inferior a 1
+regra 2
+	se [avalia(ratio(this_period,<=,1))]
+	entao [cria_facto(ratio_less_than_one(this_period,1))].
+
+%Ratio igual a 0
+regra 3 
+    se [avalia(ratio(this_period,=,0))]
+	entao [cria_facto(ratio_equals_zero(this_period,1))].
 
 
 facto(1,solar_radiation(this_period,112)).
