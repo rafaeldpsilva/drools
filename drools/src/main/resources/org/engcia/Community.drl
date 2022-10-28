@@ -7,9 +7,7 @@ import org.engcia.model.Fact;
 
 import function org.engcia.view.UI.answer;
 
-query "Conclusions"
-	$conclusion : Conclusion()
-end
+
 
 rule "R1: Ratio greater than 1"
     when
