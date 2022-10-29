@@ -13,7 +13,7 @@
 
 
 carrega_bc:-
-		write('NOME DA BASE DE CONHECIMENTO (terminar com .)-> '),
+		write('KNOWLEDGE BASE NAME (end with .)-> '),
 		read(NBC),
 		consult(NBC).
 
@@ -131,7 +131,7 @@ cria_facto(F,ID,LFactos):-
 	asserta(ultimo_facto(N)),
 	assertz(justifica(N,ID,LFactos)),
 	assertz(facto(N,F)),
-	write('Foi conclu�do o facto n� '),write(N),write(' -> '),write(F),get0(_),!.
+	write('Following fact was concluded  '),write(N),write(' -> '),write(F),get0(_),!.
 
 
 
@@ -160,26 +160,26 @@ mostra_factos:-
 % Gera��o de explica��es do tipo "Como"
 
 como(N):-ultimo_facto(Last),Last<N,!,
-	write('Essa conclus�o n�o foi tirada'),nl,nl.
+	write('This conclusion wasnt reached'),nl,nl.
 como(N):-justifica(N,ID,LFactos),!,
 	facto(N,F),
-	write('Conclui o facto n� '),write(N),write(' -> '),write(F),nl,
-	write('pela regra '),write(ID),nl,
-	write('por se ter verificado que:'),nl,
+	write('Concludes the fact number '),write(N),write(' -> '),write(F),nl,
+	write('by rule '),write(ID),nl,
+	write('because it verified that '),nl,
 	escreve_factos(LFactos),
 	write('********************************************************'),nl,
 	explica(LFactos).
 como(N):-facto(N,F),
-	write('O facto n� '),write(N),write(' -> '),write(F),nl,
-	write('foi conhecido inicialmente'),nl,
+	write('Fact number '),write(N),write(' -> '),write(F),nl,
+	write('was initially known'),nl,
 	write('********************************************************'),nl.
 
 
 escreve_factos([I|R]):-facto(I,F), !,
-	write('O facto n� '),write(I),write(' -> '),write(F),write(' � verdadeiro'),nl,
+	write('Fact number '),write(I),write(' -> '),write(F),write(' is true'),nl,
 	escreve_factos(R).
 escreve_factos([I|R]):-
-	write('A condi��o '),write(I),write(' � verdadeira'),nl,
+	write('The condition '),write(I),write(' is true'),nl,
 	escreve_factos(R).
 escreve_factos([]).
 
@@ -201,16 +201,16 @@ whynot(Facto):-
 whynot(Facto,_):-
 	facto(_, Facto),
 	!,
-	write('O facto '),write(Facto),write(' n�o � falso!'),nl.
+	write('The fact '),write(Facto),write(' is not false!'),nl.
 whynot(Facto,Nivel):-
 	encontra_regras_whynot(Facto,LLPF),
 	whynot1(LLPF,Nivel).
 whynot(nao Facto,Nivel):-
-	formata(Nivel),write('Porque:'),write(' O facto '),write(Facto),
-	write(' � verdadeiro'),nl.
+	formata(Nivel),write('Because:'),write(' The fact '),write(Facto),
+	write(' is true'),nl.
 whynot(Facto,Nivel):-
-	formata(Nivel),write('Porque:'),write(' O facto '),write(Facto),
-	write(' n�o est� definido na base de conhecimento'),nl.
+	formata(Nivel),write('Because:'),write(' The fact '),write(Facto),
+	write(' isnt defined in the knowledge base'),nl.
 
 %  As explica��es do whynot(Facto) devem considerar todas as regras que poderiam dar origem a conclus�o relativa ao facto Facto
 
@@ -226,7 +226,7 @@ encontra_regras_whynot(Facto,LLPF):-
 
 whynot1([],_).
 whynot1([(ID,LPF)|LLPF],Nivel):-
-	formata(Nivel),write('Porque pela regra '),write(ID),write(':'),nl,
+	formata(Nivel),write('Because by the rule '),write(ID),write(':'),nl,
 	Nivel1 is Nivel+1,
 	explica_porque_nao(LPF,Nivel1),
 	whynot1(LLPF,Nivel).
@@ -258,14 +258,14 @@ encontra_premissas_falsas([]).
 explica_porque_nao([],_).
 explica_porque_nao([nao avalia(X)|LPF],Nivel):-
 	!,
-	formata(Nivel),write('A condi��o nao '),write(X),write(' � falsa'),nl,
+	formata(Nivel),write('The condition is '),write(X),write(' not false'),nl,
 	explica_porque_nao(LPF,Nivel).
 explica_porque_nao([avalia(X)|LPF],Nivel):-
 	!,
-	formata(Nivel),write('A condi��o '),write(X),write(' � falsa'),nl,
+	formata(Nivel),write('The condition '),write(X),write(' is  false'),nl,
 	explica_porque_nao(LPF,Nivel).
 explica_porque_nao([P|LPF],Nivel):-
-	formata(Nivel),write('A premissa '),write(P),write(' � falsa'),nl,
+	formata(Nivel),write('The premise '),write(P),write(' is false'),nl,
 	Nivel1 is Nivel+1,
 	whynot(P,Nivel1),
 	explica_porque_nao(LPF,Nivel).
