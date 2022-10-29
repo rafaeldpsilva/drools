@@ -20,7 +20,23 @@ carrega_bc:-
 tenergai:-calculos, arranca_motor.
 
 calculos:- cria_facto_consumo,
-			calcular_ratio.
+			calcular_ratio,
+			check_expensive_hour,
+			calcular_excess.
+
+check_expensive_hour:-retract(ultimo_facto(X1)),write(nl),write(X1),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(expensive_hour(this_period,1)))). 	
+
+calcular_excess:-retract(ultimo_facto(X1)),write(nl),write(X1),
+	X is X1+1,
+	facto(_,production(_,Prod)),
+	facto(_,facto_total_consumo(TotalConsum)),
+	Excess is Prod - TotalConsum,
+	Excess > 0,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(excess(this_period,Excess)))).
 	
 calcular_ratio:-retract(ultimo_facto(X1)),write(nl),write(X1),
 	X is X1+1,
