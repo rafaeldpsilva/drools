@@ -18,7 +18,6 @@ facto_dispara_regras(ratio(this_period,_), [1,2,3]).
 ultimo_facto(21).
 ultima_regra(1).
 
-
 % Ratio superior a 1
 regra 1
 	se [avalia(ratio(this_period,>,1))]
@@ -34,15 +33,72 @@ regra 3
     se [avalia(ratio(this_period,=,0))]
 	entao [cria_facto(ratio_equals_zero(this_period,1))].
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[R>1]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+regra 4
+	se[ratio_more_than_one(this_period,1) e predicted_scarcity(this_period,0)]
+	entao [cria_facto(shift_load_question(this_period,1))].
+
+regra 5
+	se [shift_load_question(this_period,1) e want_shift_load(this_period,0) e has_EV(this_period,0)]
+	entao [cria_facto(selling(this_period,1))]
+
+regra 6
+	se [selling(this_period,1) e excess(this_period,E)]
+	entao [cria_facto(should_sell(this_period, E))]
+
+regra 7
+	se [shift_load_question(this_period,1) e want_shift_load(this_period,0) e has_EV(this_period,1)]
+	entao [cria_facto(check_battery(this_period,1))]
+
+regra 8
+	se [check_battery(this_period, 1) e avalia(battery_ev(this_period,>=,50))]
+	entao [cria_facto(selling(this_period,1))]
+
+regra 9
+	se [check_battery(this_period, 1) e avalia(battery_ev(this_period,<,50))]
+	entao [cria_facto(ckeck_expensive_hour(this_period,1))]
+
+regra 10
+	se [ckeck_expensive_hour(this_period, 1) e expensive_hour(this_period,1)]
+	entao [cria_facto(selling(this_period,1))]
+
+regra 11
+	se [ckeck_expensive_hour(this_period, 1) e expensive_hour(this_period,0)]
+	entao [cria_facto(charge_battery(this_period,1))]
+
+regra 12
+	se [shift_load_question(this_period,1) e want_shift_load(this_period,1)]
+	entao [cria_facto(shift_load_options(this_period,1))]
+
+regra 13
+	se [shift_load_options(this_period,1) e options(this_period, OP)]
+	entao [print_options(OP)]
+
+regra 14
+	se[ratio_more_than_one(this_period,1) e predicted_scarcity(this_period,1) e has_EV(this_period,0)]
+	entao [cria_facto(selling(this_period,1))]
+
+regra 15
+	se[ratio_more_than_one(this_period,1) e predicted_scarcity(this_period,1) e has_EV(this_period,1)]
+	entao [cria_facto(check_battery_scarcity(this_period,1))]
+
+regra 16
+	se [check_battery_scarcity(this_period, 1) e avalia(battery_ev(this_period,<,50))]
+	entao [cria_facto(charge_battery(this_period,1))]
+
+regra 17
+	se [check_battery_scarcity(this_period, 1) e avalia(battery_ev(this_period,>=,50))]
+	entao [cria_facto(selling(this_period,1))]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[1>=R>0]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 
 facto(1,solar_radiation(this_period,112)).
 facto(2,temperature(this_period,6)).
 facto(3,wind_speed(this_period,15)).
 
-
-%vem pelo write
-%device(EV,150).
-%has_EV(this_period,1).
 
 
 %period 1
@@ -74,7 +130,15 @@ facto(19,essential(microwave,1)).
 
 facto(20,energy_price(this_period,0.005)).
 facto(21, usertype(individual)).
+facto(22,device(ev,150)).
+facto(23,has_EV(this_period,1)).
+facto(24,predicted_scarcity(this_period,0)).
+facto(25,want_shift_load(this_period,0)).
+facto(26, battery_ev(this_period,89)).
+
 % facto(21, usertype(community))
+
+
 
 
 
