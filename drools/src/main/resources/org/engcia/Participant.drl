@@ -67,13 +67,35 @@ rule "R6: R>1 and Has EV and Sufficiently Charged Battery -> Sell to the communi
         insert(c);
 end
 
-rule "R7: R>1 and Has EV and Not Sufficiently Charged Battery -> Charge Battery"
+rule "R7: R>1 and Has EV and Not Sufficiently Charged Battery"
+    when
+        Hypothesis(description == "R>1", value == "true")
+        Hypothesis(description == "Has EV", value == "true")        
+        eval(answer("Sufficiently Charged Battery", "no"))
+    then
+        Hypothesis h = new Hypothesis("Sufficiently Charged Battery", "false");
+        insert(h);
+end
+
+rule "R7: R>1 and Has EV and Not Sufficiently Charged Battery and Not Expensive Hour -> Charge Battery"
     when
         Hypothesis(description == "R>1", value == "true")
         Hypothesis(description == "Has EV", value == "true")
-        eval(answer("Sufficiently Charged Battery", "no"))
+        Hypothesis(description == "Sufficiently Charged Battery", value == "false")
+        eval(answer("Expensive Hour", "no"))
     then
         Conclusion c = new Conclusion(Conclusion.CHARGE_BATTERY);
+        insert(c);
+end
+
+rule "R7: R>1 and Has EV and Not Sufficiently Charged Battery and Expensive Hour -> Sell"
+    when
+        Hypothesis(description == "R>1", value == "true")
+        Hypothesis(description == "Has EV", value == "true")
+        Hypothesis(description == "Sufficiently Charged Battery", value == "false")
+        eval(answer("Expensive Hour", "yes"))
+    then
+        Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY_MARKET);
         insert(c);
 end
 
@@ -194,7 +216,7 @@ end
 rule "R20: R>0 and Predicted Energy Scarcity and Has EV"
     when
         Hypothesis(description == "R>0", value == "true")
-        Hypothesis(description == "Predicted Energy Scarcity", value == "true");
+        Hypothesis(description == "Predicted Energy Scarcity", value == "true")
         eval(answer("Has EV", "yes"))
     then
         Hypothesis h = new Hypothesis("Has EV", "true");
@@ -204,6 +226,7 @@ end
 rule "R21: R>0 and Predicted Energy Scarcity and Not Has EV"
     when
         Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "Predicted Energy Scarcity", value == "true")
         eval(answer("Has EV", "no"))
     then
         Hypothesis h = new Hypothesis("Has EV", "false");
@@ -240,10 +263,9 @@ rule "R24: R>0 and Not Predicted Energy Scarcity and Can Improve R -> Improve R"
         insert(c);
 end
 
-rule "R25: R>0 and Predicted Energy Scarcity and Not Has EV and Can Improve R -> Improve R"
+rule "R25: R>0 and Not Has EV and Can Improve R -> Improve R"
     when
         Hypothesis(description == "R>0", value == "true")
-        Hypothesis(description == "Predicted Energy Scarcity", value == "true")
         Hypothesis(description == "Has EV", value == "false")
         eval(answer("Can Improve R", "yes"))
     then
@@ -251,10 +273,9 @@ rule "R25: R>0 and Predicted Energy Scarcity and Not Has EV and Can Improve R ->
         insert(c);
 end
  
-rule "R26: R>0 and Has EV and Sufficiently Charged Battery and Can Improve R -> Improve R"
+rule "R26: R>0 and Sufficiently Charged Battery and Can Improve R -> Improve R"
     when
         Hypothesis(description == "R>0", value == "true")
-        Hypothesis(description == "Has EV", value == "true")
         Hypothesis(description == "Sufficiently Charged Battery", value == "true")
         eval(answer("Can Improve R", "yes"))
     then
@@ -272,10 +293,9 @@ rule "R27: R>0 and Not Predicted Energy Scarcity and Cannot Improve R"
         insert(h);
 end
 
-rule "R28: R>0 and Predicted Energy Scarcity and Not Has EV and Cannot Improve R"
+rule "R28: R>0 and Not Has EV and Cannot Improve R"
     when
         Hypothesis(description == "R>0", value == "true")
-        Hypothesis(description == "Predicted Energy Scarcity", value == "false")
         Hypothesis(description == "Has EV", value == "false")
         eval(answer("Can Improve R", "no"))
     then
@@ -283,34 +303,31 @@ rule "R28: R>0 and Predicted Energy Scarcity and Not Has EV and Cannot Improve R
         insert(h);
 end
 
-rule "R29: R>0 and Has EV and Sufficiently Charged Battery and Cannot Improve R"
+rule "R29: R>0 and Sufficiently Charged Battery and Cannot Improve R"
     when
         Hypothesis(description == "R>0", value == "true")
-        Hypothesis(description == "Has EV", value == "true")
-        Hypothesis(description == "Sufficiently Charged Battery", value == "false")
+        Hypothesis(description == "Sufficiently Charged Battery", value == "true")
         eval(answer("Can Improve R", "no"))
     then
         Hypothesis h = new Hypothesis("Improve R", "false");
         insert(h);
 end
 
-rule "R30: R>0 and Cannot Improve R and Has EV and R=1 -> Buy Cheapest Market"
+rule "R30: R>0 and Cannot Improve R and Not R=1 -> Buy Cheapest Market"
     when
         Hypothesis(description == "R>0", value == "true")
         Hypothesis(description == "Improve R", value == "false")
-        Hypothesis(description == "Has EV", value == "true")
-        eval(answer("Ratio equal to 1", "yes"))
+        eval(answer("Ratio equal to 1", "no"))
     then
         Conclusion c = new Conclusion(Conclusion.BUY_CHEAPEST_MARKET);
         insert(c);
 end
 
-rule "R31: R>0 and Cannot Improve R and Has EV and Not R=1 -> No operation needed"
+rule "R31: R>0 and Cannot Improve R and R=1 -> No operation needed"
     when
         Hypothesis(description == "R>0", value == "true")
         Hypothesis(description == "Improve R", value == "false")
-        Hypothesis(description == "Has EV", value == "true")
-        eval(answer("Ratio equal to 1", "no"))
+        eval(answer("Ratio equal to 1", "yes"))
     then
         Conclusion c = new Conclusion(Conclusion.NO_OPERATION_NEEDED);
         insert(c);
@@ -326,7 +343,7 @@ end
 
 rule "R33: Not R>0 and Has EV"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         eval(answer("Has EV", "yes"))
     then
         Hypothesis h = new Hypothesis("Has EV", "true");
@@ -335,7 +352,7 @@ end
 
 rule "R34: Not R>0 and Not Has EV"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         eval(answer("Has EV", "no"))
     then
         Hypothesis h = new Hypothesis("Has EV", "false");
@@ -344,7 +361,7 @@ end
 
 rule "R35: Not R>0 and Not Sufficiently Charged Battery -> Charge"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         eval(answer("Sufficiently Charged Battery", "no"))
     then
         Conclusion c = new Conclusion(Conclusion.CHARGE_BATTERY);
@@ -353,7 +370,7 @@ end
 
 rule "R36: Not R>0 and Sufficiently Charged Battery"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         eval(answer("Sufficiently Charged Battery", "yes"))
     then
         Hypothesis h = new Hypothesis("Sufficiently Charged Battery", "true");
@@ -362,7 +379,7 @@ end
 
 rule "R37: Not R>0 and Sufficiently Charged Battery and Predicted Energy Scarcity"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Sufficiently Charged Battery", value == "true")
         eval(answer("Predicted Energy Scarcity", "yes"))
     then
@@ -372,7 +389,7 @@ end
 
 rule "R38: Not R>0 and Sufficiently Charged Battery and Not Predicted Energy Scarcity -> Use Battery"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Sufficiently Charged Battery", value == "true")
         eval(answer("Predicted Energy Scarcity", "no"))
     then
@@ -382,7 +399,7 @@ end
 
 rule "R39: Not R>0 and Not Predicted Energy Scarcity and Expensive Hour -> Shift load to essential consumption"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Predicted Energy Scarcity", value == "false")
         eval(answer("Expensive Hour", "yes"))
     then
@@ -392,7 +409,7 @@ end
 
 rule "R40: Not R>0 and Not Predicted Energy Scarcity and Not Expensive Hour -> Keep Buying"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Predicted Energy Scarcity", value == "false")
         eval(answer("Expensive Hour", "no"))
     then
@@ -402,7 +419,7 @@ end
 
 rule "R41: Not R>0 and Not Has EV and Expensive Hour -> Shift load to essential consumption"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Has EV", value == "false")
         eval(answer("Expensive Hour", "yes"))
     then
@@ -412,7 +429,7 @@ end
 
 rule "R42: Not R>0 and Not Has EV and Not Expensive Hour -> Keep Buying"
     when
-        Hypothesis(description == "R>0", value == "true")
+        Hypothesis(description == "R>0", value == "false")
         Hypothesis(description == "Has EV", value == "false")
         eval(answer("Expensive Hour", "no"))
     then
