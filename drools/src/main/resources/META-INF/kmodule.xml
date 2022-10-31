@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kmodule xmlns="http://www.drools.org/xsd/kmodule">
-  <kbase name="community-rules" packages="org.engcia">
-    <ksession name="community-rules"/>
-  </kbase>
   <kbase name="participant-rules" packages="org.engcia">
     <ksession name="participant-rules"/>
+  </kbase>
+  <kbase name="community-rules" packages="org.engcia">
+    <ksession name="community-rules"/>
   </kbase>
 </kmodule>

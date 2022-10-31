@@ -1,5 +1,3 @@
-
-
 FUNCTION_BLOCK scarcity	// Block definition (there may be more than one block per file)
 
 VAR_INPUT				// Define input variables
@@ -8,29 +6,30 @@ VAR_INPUT				// Define input variables
 END_VAR
 
 VAR_OUTPUT				// Define output variable
-	scarcity_level : REAL;
+	energy_scarcity : REAL;
 END_VAR
 
-FUZZIFY wind_power			// Fuzzify input variable 'psa': {'low', 'medium' , 'high'}
-	TERM none := (0, 1) (3, 1) ;
+FUZZIFY wind_power			// Fuzzify input variable 'wind_power': {'low', 'medium' , 'high'}
+	TERM none := (0, 1) (3, 1) (3,0) ;
 	TERM low := (3, 0) (6,1) (9,0) ;
 	TERM medium := (6, 0) (10, 1) (14, 0);
-	TERM high := (13, 0) (14, 1) (25, 1);
-	TERM too_high := (25, 1) (105, 1);
+	TERM high := (10, 0) (14, 1) (25, 1)(25,0);
+	TERM too_high := (25.001,0)(25.001, 1) (105, 1);
 END_FUZZIFY
 
-FUZZIFY solar_power			// Fuzzify input variable 'sd': { 'slow', 'medium', 'fast' }
-	TERM none := (0, 1) (4, 0) ;
-    TERM low := (0, 0) (4,1) (8,0) ;
-    TERM medium := (4, 0) (8, 1) (60, 1);
-    TERM high := (4, 0) (8, 1) (60, 1);
+FUZZIFY solar_power			// Fuzzify input variable 'solar_power': { 'slow', 'medium', 'fast' }
+	TERM none := (0, 1)(0,0);
+    TERM low := (0, 0) (200,1) (550,0) ;
+    TERM medium := (200, 0) (550, 1) (800, 0);
+    TERM high := (550, 0) (800, 1) (1500, 1);
 END_FUZZIFY
 
-DEFUZZIFY sl			// Defuzzify output variable 'sl' : {'little', 'medium', 'much', 'much_more' }
-	TERM little := (0, 1) (200, 1) (600, 0) ;
-	TERM medium := (200, 0) (600, 1) (1000, 0) ;
-	TERM high := (600, 0) (1000, 1) (1400, 0) ;
-	TERM extreme := (1000, 0) (1400, 1) (1600, 1);
+DEFUZZIFY energy_scarcity			// Defuzzify output variable 'energy_scarcity' : {'extreme', 'medium', 'small', 'none' }
+	TERM extreme := (0, 1) (6, 0)  ;
+	TERM high := (3, 0) (6, 1) (9, 0) ;
+	TERM medium := (6, 0) (9, 1) (12, 0) ;
+	TERM low := (9, 0) (12, 1) (15, 0) ;
+	TERM none := (12, 0) (15, 1) (30, 1);
 	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
 	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
 END_DEFUZZIFY
@@ -38,18 +37,70 @@ END_DEFUZZIFY
 RULEBLOCK No1
 	AND : MIN;			// Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
 	ACT : MIN;			// Use 'min' activation method
-	ACCU : MAX;			// Use 'max' accumulation method
-
-	RULE 1 : IF psa IS low AND sd IS slow THEN sl IS little;
-	RULE 2 : IF psa IS low AND sd IS medium THEN sl IS medium; 
-	RULE 3 : IF psa IS low AND sd IS fast THEN sl IS medium;
-	RULE 4 : IF psa IS medium AND sd IS slow THEN sl IS little;
-	RULE 5 : IF psa IS medium AND sd IS medium THEN sl IS medium;
-	RULE 6 : IF psa IS medium AND sd IS fast THEN sl IS much;
-	RULE 7 : IF psa IS high AND sd IS slow THEN sl IS much;
-	RULE 8 : IF psa IS high AND sd IS medium THEN sl IS much;
-	RULE 9 : IF psa IS high AND sd IS fast THEN sl IS much_more;
+	ACCU : MAX;			// Use 'max' accumulation method             // solar_power (none, low, medium, high), wind_power(none, low, high, too_high)
+	RULE 1 : IF wind_power IS none AND solar_power IS none THEN energy_scarcity IS extreme;
+	RULE 2 : IF wind_power IS none AND solar_power IS low THEN energy_scarcity IS high;
+	RULE 3 : IF wind_power IS none AND solar_power IS medium THEN energy_scarcity IS high; 
+	RULE 4 : IF wind_power IS none AND solar_power IS high THEN energy_scarcity IS medium;
+	RULE 5 : IF wind_power IS low AND solar_power IS none THEN energy_scarcity IS high;
+	RULE 6 : IF wind_power IS low AND solar_power IS low THEN energy_scarcity IS medium;
+	RULE 7 : IF wind_power IS low AND solar_power IS medium THEN energy_scarcity IS medium;
+	RULE 8 : IF wind_power IS low AND solar_power IS high THEN energy_scarcity IS medium;
+	RULE 9 : IF wind_power IS medium AND solar_power IS none THEN energy_scarcity IS high;
+	RULE 10 : IF wind_power IS medium AND solar_power IS low THEN energy_scarcity IS medium;
+	RULE 11 : IF wind_power IS medium AND solar_power IS medium THEN energy_scarcity IS low;
+	RULE 12 : IF wind_power IS medium AND solar_power IS high THEN energy_scarcity IS none;
+	RULE 13 : IF wind_power IS high AND solar_power IS none THEN energy_scarcity IS medium;
+	RULE 14 : IF wind_power IS high AND solar_power IS low THEN energy_scarcity IS medium;
+	RULE 15 : IF wind_power IS high AND solar_power IS medium THEN energy_scarcity IS low;
+	RULE 16 : IF wind_power IS high AND solar_power IS high THEN energy_scarcity IS none;
+	RULE 17 : IF wind_power IS too_high AND solar_power IS none THEN energy_scarcity IS extreme;
+	RULE 18 : IF wind_power IS too_high AND solar_power IS low THEN energy_scarcity IS high;
+	RULE 19 : IF wind_power IS too_high AND solar_power IS medium THEN energy_scarcity IS high;
+	RULE 20 : IF wind_power IS too_high AND solar_power IS high THEN energy_scarcity IS medium;
 END_RULEBLOCK
 
 END_FUNCTION_BLOCK
 
+
+
+// Calculation of solar_power
+//
+//   E = A * r * H * PR
+//
+//E = Energy (kWh)
+// A = Total solar panel Area (m2) (1.6m^2)
+// r = solar panel yield or efficiency(%) (17%)
+// H = Annual average solar radiation on tilted panels (shadings not included)
+// PR = Performance ratio, coefficient for losses (range between 0.5 and 0.9, default value = 0.75)
+//
+//
+//Calculation of wind_power
+//
+//Power (W) = 1/2 x ρ x A x v3
+//Power = Watts
+// ρ (rho, a Greek letter) = density of the air in kg/m3
+// A = cross-sectional area of the wind in m2
+// v = velocity of the wind in m/s
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//

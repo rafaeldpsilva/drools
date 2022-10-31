@@ -2,6 +2,7 @@ package org.engcia.sample;
 
 //import org.drools.core.rule.builder.dialect.asm.ClassGenerator;
 
+import org.engcia.fuzzy.FuzzyLogic;
 import org.engcia.model.Conclusion;
 import org.engcia.model.Justification;
 import org.engcia.view.UI;
@@ -34,12 +35,13 @@ public class DroolsTest {
 
     private static void runEngine() {
         try {
+
             DroolsTest.justifications = new TreeMap<Integer, Justification>();
 
             // load up the knowledge base
             KieServices ks = KieServices.Factory.get();
             KieContainer kContainer = ks.getKieClasspathContainer();
-            final KieSession kSession = kContainer.newKieSession("participant-rules");
+            final KieSession kSession = kContainer.newKieSession("community-rules");
             DroolsTest.KS = kSession;
             DroolsTest.agendaEventListener = new TrackingAgendaEventListener();
             kSession.addEventListener(agendaEventListener);
@@ -73,6 +75,7 @@ public class DroolsTest {
             LiveQuery query = kSession.openLiveQuery("Conclusions", null, listener);
 
             kSession.fireAllRules();
+            kSession.dispose();
             // kSession.fireUntilHalt();
 
             query.close();
