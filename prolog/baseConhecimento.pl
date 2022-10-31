@@ -6,14 +6,14 @@
 facto_dispara_regras(usertype(individual), [1,2,3]).
 facto_dispara_regras(ratio(this_period,_), [1,2,3,24,25]).
 facto_dispara_regras(ratio_more_than_one(this_period,_), [4,14,15]).
-facto_dispara_regras(predicted_scarcity(this_period,_), [4,14,15,18,21,22,26,29,32,33]).
+facto_dispara_regras(predicted_scarcity(this_period,_), [4,14,15,18,21,22,28,29]).
 facto_dispara_regras(shift_load_question(this_period,_), [5,7,12]).
 facto_dispara_regras(want_shift_load(this_period,_), [5,7,12]).
-facto_dispara_regras(has_EV(this_period,_), [5,7,14,15,18,21,26,29,32,33]).
+facto_dispara_regras(has_EV(this_period,_), [5,7,14,15,18,21,26,32]).
 facto_dispara_regras(selling(this_period,_), [6]).
 facto_dispara_regras(excess(this_period,_), [6]).
 facto_dispara_regras(check_battery(this_period, _), [8,9]).
-facto_dispara_regras(battery_ev(this_period,_), [8,9,16,17,19,20,27,28,34,35]).
+facto_dispara_regras(battery_ev(this_period,_), [8,9,16,17,19,20,27,28,29]).
 facto_dispara_regras(check_expensive_hour(this_period, _), [10,11]).
 facto_dispara_regras(expensive_hour(this_period,_), [10,11,30,31]).
 facto_dispara_regras(shift_load_options(this_period,_), [13]).
@@ -23,28 +23,28 @@ facto_dispara_regras(ratio_less_than_one(this_period,_), [18,21,22]).
 facto_dispara_regras(check_battery_scarcity_r_less_than_one(this_period, _), [19,20]).
 facto_dispara_regras(r_improvement(this_period,_), [23,24,25]).
 facto_dispara_regras(can_improve_r(this_period,_), [23,24,25]).
-facto_dispara_regras(ratio_equals_zero(this_period,_), [26,29,32,33]).
-facto_dispara_regras(check_battery_r_equals_zero(this_period,_), [27,28]).
-facto_dispara_regras(check_expensive_hour_r_equals_zero(this_period, _), [30,31]).
+facto_dispara_regras(ratio_equals_zero(this_period,_), [26,32]).
+facto_dispara_regras(check_battery_r_equals_zero(this_period,_), [27,28,29]).
+facto_dispara_regras(check_expensive_hour_r_equals_zero(this_period, _), [30,31,32]).
 facto_dispara_regras(check_battery_scarcity_r_equals_zero(this_period,_), [34,35]).
 
-facto_dispara_regras(usertype(community),[36,37]).
-facto_dispara_regras(community_ratio(this_period,_),[36,37]).
-facto_dispara_regras(community_ratio_more_than_one(this_period,_),[38,41]).
-facto_dispara_regras(community_predicted_scarcity(this_period,_),[38,41,51,52,54]).
-facto_dispara_regras(community_check_battery(this_period,_),[39,40]).
-facto_dispara_regras(community_battery(this_period,_),[39,40,47,49,54,55]).
-facto_dispara_regras(check_community_demand(this_period,_),[42,43]).
-facto_dispara_regras(community_demand(this_period,_),[42,43]).
-facto_dispara_regras(check_community_external_market_demand(this_period,_),[44,45]).
-facto_dispara_regras(external_market_demand(this_period,_),[44,45]).
-facto_dispara_regras(community_ratio_less_than_one(this_period,_),[46,48]).
-facto_dispara_regras(current_energy_scarcity(this_period,_),[46,48]).
-facto_dispara_regras(check_community_batteries_charged(this_period,_),[47,48]).
-facto_dispara_regras(check_community_participants_with_surplus(this_period,_),[50]).
-facto_dispara_regras(participant_with_surplus(this_period,_),[50,51]).
-facto_dispara_regras(community_expensive_hour(this_period,_),[52,53]).
-facto_dispara_regras(check_community_battery_suff_charged(this_period,_),[54,55]).
+facto_dispara_regras(usertype(community),[33,34]).
+facto_dispara_regras(community_ratio(this_period,_),[33,34]).
+facto_dispara_regras(community_ratio_more_than_one(this_period,_),[35,38]).
+facto_dispara_regras(community_predicted_scarcity(this_period,_),[35,38,48,49,50]).
+facto_dispara_regras(community_check_battery(this_period,_),[36,37]).
+facto_dispara_regras(community_battery(this_period,_),[36,37,44,46,51,52]).
+facto_dispara_regras(check_community_demand(this_period,_),[39,40]).
+facto_dispara_regras(community_demand(this_period,_),[39,40]).
+facto_dispara_regras(check_community_external_market_demand(this_period,_),[41,42]).
+facto_dispara_regras(external_market_demand(this_period,_),[41,42]).
+facto_dispara_regras(community_ratio_less_than_one(this_period,_),[43,45]).
+facto_dispara_regras(current_energy_scarcity(this_period,_),[43,45]).
+facto_dispara_regras(check_community_batteries_charged(this_period,_),[44,46]).
+facto_dispara_regras(check_community_participants_with_surplus(this_period,_),[47]).
+facto_dispara_regras(participant_with_surplus(this_period,_),[47,48]).
+facto_dispara_regras(community_expensive_hour(this_period,_),[49,50]).
+facto_dispara_regras(check_community_battery_suff_charged(this_period,_),[51,52]).
 
 
 
