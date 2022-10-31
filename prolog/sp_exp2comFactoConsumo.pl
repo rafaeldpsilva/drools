@@ -21,30 +21,94 @@ tenergai:-calculos, arranca_motor.
 
 calculos:- cria_facto_consumo,
 			calcular_ratio,
+			ask_actual_price,
 			check_expensive_hour,
-			calcular_excess.
+			calcular_excess,
+			calcular_deficit,
+			shift_load,
+			shift_load_deficit(I),
+			check_r_improvement(I).
+
+
+ask_actual_price:-
+	write('ACTUAL ENERGY PRICE (end with .)-> '),
+	read(PA),
+	retract(ultimo_facto(X1)),write(nl),write(X1),
+	(call(facto(_,(preco_atual(this_period,PA)))),!);
+	(call(facto(F,(preco_atual(this_period,_)))),
+	retract(facto(F,(preco_atual(this_period,_)))),
+	assert(facto(F,(preco_atual(this_period,PA)))),!);
+	(X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,preco_atual(this_period,PA)))).
 
 check_expensive_hour:-retract(ultimo_facto(X1)),write(nl),write(X1),
-	X is X1+1,
+	facto(_,preco_atual(_,PA)),
+	facto(_,preco_medio(_,PM)),
+	(call(facto(F,(expensive_hour(this_period,_)))),
+	retract(facto(F,(expensive_hour(this_period,_)))),
+	(PA >= PM ->
+	assert(facto(F,(expensive_hour(this_period,1)))))
+	; (PA < PM ->
+	assert(facto(F,(expensive_hour(this_period,0))))
+	));
+	(PA >= PM ->
 	asserta(ultimo_facto(X)),
-	assertz(facto(X,(expensive_hour(this_period,1)))). 	
+	(assertz(facto(X,(expensive_hour(this_period,1)))))
+	; (PA < PM -> 
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(expensive_hour(this_period,0)))))). 
 
 calcular_excess:-retract(ultimo_facto(X1)),write(nl),write(X1),
 	X is X1+1,
 	facto(_,production(_,Prod)),
-	facto(_,facto_total_consumo(TotalConsum)),
+	facto(_,facto_total_consumo(_,TotalConsum)),
 	Excess is Prod - TotalConsum,
 	Excess > 0,
+	(call(facto(_,(excess(this_period,Excess)))),!);
+	(call(facto(F,(excess(this_period,_)))),
+	retract(facto(F,(excess(this_period,_)))),
+	assert(facto(F,(excess(this_period,Excess)))),!);(
 	asserta(ultimo_facto(X)),
-	assertz(facto(X,(excess(this_period,Excess)))).
+	assertz(facto(X,(excess(this_period,Excess))))).
+
+calcular_deficit:-retract(ultimo_facto(X1)),write(nl),write(X1),
+	X is X1+1,
+	facto(_,production(_,Prod)),
+	facto(_,facto_total_consumo(_,TotalConsum)),
+	Deficit is Prod - TotalConsum,
+	Deficit < 0,
+	(call(facto(_,(deficit(this_period,Deficit)))),!);
+	(call(facto(F,(deficit(this_period,_)))),
+	retract(facto(F,(deficit(this_period,_)))),
+	assert(facto(F,(deficit(this_period,Deficit)))),!);
+	(asserta(ultimo_facto(X)),
+	assertz(facto(X,(deficit(this_period,Deficit))))).
 	
 calcular_ratio:-retract(ultimo_facto(X1)),write(nl),write(X1),
 	X is X1+1,
 	facto(_,production(_,Prod)),
-	facto(_,facto_total_consumo(TotalConsum)),
+	facto(_,facto_total_consumo(_,TotalConsum)),
 	Ratio is Prod / TotalConsum,
-	asserta(ultimo_facto(X)),
-	assertz(facto(X,(ratio(this_period,Ratio)))).
+	(call(facto(_,(ratio(this_period,Ratio)))),!);
+	(call(facto(F,(ratio(this_period,_)))),
+	retract(facto(F,(ratio(this_period,_)))),
+	assert(facto(F,(ratio(this_period,Ratio)))),!);
+	(asserta(ultimo_facto(X)),
+	assertz(facto(X,(ratio(this_period,Ratio))))).
+
+print_options(OP):-write('These are your options to shift load:\n'), write(OP).
+
+print_no_operation:-write('No operations is required.\n').
+
+print_shift_load_to_essential_consumption:-
+	facto(_,load_essential(_,L)),
+	write('These are your options to shift load and reduce your deficit:\n'), write(L).
+
+print_improvements:-
+	facto(_,load_essential(_,L)),
+	write('These are your options to improve the ratio:\n'), write(L).
+
 
 arranca_motor:-
 	facto(N,Facto),
@@ -54,7 +118,11 @@ arranca_motor:-
 
 cria_facto_consumo:-findall(X,facto(_,device(_,X)),LR),write(nl), write(LR),!,calcula_consumo(LR,T),write(nl),write(T),retract(ultimo_facto(N1)),write(nl),write(N1),
 	N is N1+1,
-	asserta(ultimo_facto(N)),assertz(facto(N,(facto_total_consumo(T)))).
+	(call(facto(_,(facto_total_consumo(this_period,T)))),!);
+	(call(facto(F,(facto_total_consumo(this_period,_)))),
+	retract(facto(F,(facto_total_consumo(this_period,_)))),
+	assert(facto(F,(facto_total_consumo(this_period,T)))),!);(
+	asserta(ultimo_facto(N)),assertz(facto(N,(facto_total_consumo(this_period,T))))).
 
 calcula_consumo([],0):-!.
 calcula_consumo([H|T],R):-calcula_consumo(T,R1), R is H + R1.
@@ -273,27 +341,73 @@ explica_porque_nao([P|LPF],Nivel):-
 formata(Nivel):-
 	Esp is (Nivel-1)*5, tab(Esp).
 
-% shift_load(L):-
-% 	cria_facto_consumo(C),
-% 	facto(_,production(_,P)),
-% 	E is P-C,
-% 	E>0,
-% 	combine(E,L1), flatten(L1,L).
-	
+%%%%%%%%%%%%%%%%[Disconnect Devices using all production]%%%%%%%%%%%%%%%%%%%%
 
-% cria_facto_consumo(T):-findall(X,(facto(_,device(N,X)), facto(_,(N,1))),LR),calcula_consumo(LR,T),write('consumo\n'),write(T).
+shift_load:-
+	facto(_,(excess(this_period,E))),
+	E>0,
+	combine(E,L1), flatten(L1,L), 
+	retract(ultimo_facto(N1)),
+	(call(facto(_,(options(this_period,L)))),!);
+	(call(facto(F,(options(this_period,_)))),
+	retract(facto(F,(options(this_period,_)))),
+	assert(facto(F,(options(this_period,L)))),!);
+	(N is N1+1,
+	asserta(ultimo_facto(N)),
+	assertz(facto(N,(options(this_period,L))))).
 
-% calcula_consumo([],0):-!.
-% calcula_consumo([H|T],R):-calcula_consumo(T,R1), R is H + R1.
+combine(E, LR):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOne(LR,D1,LR1).
 
-% combine(E, LR):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOne(LR,D1,LR1).
+makecombinations([], _,[]).
+makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
+combinations(_,0, []):-!.
+combinations([],_, []):-!.
+combinations([device(N,X)|T],E, [device(N,X)|R]):-E>0, E1 is E-X, E1>=0, combinations(T,E1,R).
+checkOneOne(LR,[], LR):-!.
+checkOneOne(LR,[H|T],L):-member(H,LR),checkOneOne(LR,T,L).
+checkOneOne(LR,[H|T], [H|L]):-checkOneOne(LR,T,L).
+devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0))),D).
 
-% makecombinations([], _,[]).
-% makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
-% combinations(_,0, []):-!.
-% combinations([],_, []):-!.
-% combinations([device(N,X)|T],E, [device(N,X)|R]):-E>0, E1 is E-X, E1>=0, combinations(T,E1,R).
-% checkOneOne(LR,[], LR):-!.
-% checkOneOne(LR,[H|T],L):-member(H,LR),checkOneOne(LR,T,L).
-% checkOneOne(LR,[H|T], [H|L]):-checkOneOne(LR,T,L).
-% devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0))),D).
+%%%%%%%%%%%%%%%%[Essentials]%%%%%%%%%%%%%%%%%%%%
+shift_load_deficit(I):-
+	facto(_,(excess(this_period,E))),
+	E<0,
+	combineEssentials(E,L1,I), flatten(L1,L), 
+	retract(ultimo_facto(N1)),
+	(call(facto(_,(load_essential(this_period,L)))),!);
+	(call(facto(F,(load_essential(this_period,_)))),
+	retract(facto(F,(load_essential(this_period,_)))),
+	assert(facto(F,(load_essential(this_period,L)))),!);
+	(N is N1+1,
+	asserta(ultimo_facto(N)),
+	assertz(facto(N,(load_essential(this_period,L))))).
+
+combineEssentials(E, LR,I):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,1)),facto(_,essential(N,0))),D),makecombinationsEssentials(D,E,LR,I),not_essentials_devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOneEssential(LR,D1,LR1).
+makecombinationsEssentials([], _,[],0).
+makecombinationsEssentials([H|T], E,[R|X],I):-E1 is E, combinationsE([H|T],E1,R,I1), makecombinationsEssentials(T,E,X,I2),I is I1+I2.
+combinationsE(_,0, [],1):-!.
+combinationsE([],_, [],0):-!.
+combinationsE([device(N,X)|T],E, [device(N,X)|R],I):-E<0, E1 is E+X, E1=<0, combinationsE(T,E1,R,I).
+checkOneOneEssential(LR,[], LR):-!.
+checkOneOneEssential(LR,[H|T],L):-member(H,LR),checkOneOneEssential(LR,T,L).
+checkOneOneEssential(LR,[H|T], [H|L]):-checkOneOneEssential(LR,T,L).
+
+not_essentials_devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,1)), facto(_,essential(N,0))),D).
+
+check_r_improvement(I):-I>0,retract(ultimo_facto(N1)),
+	(call(facto(_,(can_improve_r(this_period,1)))),!);
+	(call(facto(F,(can_improve_r(this_period,_)))),
+	retract(facto(F,(can_improve_r(this_period,_)))),
+	assert(facto(F,(can_improve_r(this_period,1)))),!);
+	(N is N1+1,
+	asserta(ultimo_facto(N)),
+	assertz(facto(N,(can_improve_r(this_period,1))))).
+
+check_r_improvement(I):-I=0,retract(ultimo_facto(N1)),
+	(call(facto(_,(can_improve_r(this_period,0)))),!);
+	(call(facto(F,(can_improve_r(this_period,_)))),
+	retract(facto(F,(can_improve_r(this_period,_)))),
+	assert(facto(F,(can_improve_r(this_period,0)))),!);
+	(N is N1+1,
+	asserta(ultimo_facto(N)),
+	assertz(facto(N,(can_improve_r(this_period,0))))).
