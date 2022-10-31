@@ -225,7 +225,7 @@ facto(23,has_EV(this_period,1)).
 facto(24,predicted_scarcity(this_period,0)).
 facto(25,want_shift_load(this_period,0)).
 facto(26, battery_ev(this_period,89)).
-
+facto(27,preco_medio(this_period,000)).
 % facto(21, usertype(community))
 
 
