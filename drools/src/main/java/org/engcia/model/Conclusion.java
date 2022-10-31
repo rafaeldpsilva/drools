@@ -1,5 +1,6 @@
 package org.engcia.model;
 
+import org.engcia.sample.DroolsTest;
 public class Conclusion extends Fact{
     public static final String CHARGE_BATTERY = "Charge Battery";
     public static final String SELL_COMMUNITY_MARKET = "Sell to the community market";
@@ -20,6 +21,7 @@ public class Conclusion extends Fact{
     public Conclusion(String description) {
         super();
         this.description = description;
+        DroolsTest.agendaEventListener.addRhs(this);
     }
 
     public String getDescription() {
