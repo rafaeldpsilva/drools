@@ -17,7 +17,10 @@ carrega_bc:-
 		read(NBC),
 		consult(NBC).
 
-tenergai:-calculos, arranca_motor.
+
+individual:-calculos, arranca_motor.
+
+community:-yyy, arranca_motor.
 
 calculos:- cria_facto_consumo,
 			calcular_ratio,
@@ -31,7 +34,7 @@ calculos:- cria_facto_consumo,
 
 
 ask_actual_price:-
-	write('ACTUAL ENERGY PRICE (end with .)-> '),
+	write('ACTUAL ENERGY PRICE eur/kWh (end with .)-> '),
 	read(PA),
 	retract(ultimo_facto(X1)),write(nl),write(X1),
 	(call(facto(_,(preco_atual(this_period,PA)))),!);
