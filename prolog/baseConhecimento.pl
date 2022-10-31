@@ -35,6 +35,9 @@ facto_dispara_regras(check_battery_scarcity_r_equals_zero(this_period,_), [34,35
 ultimo_facto(26).
 ultima_regra(34).
 
+%%%%%%%%%%%%%%%%%%Individual%%%%%%%%%%%%%%%%%%%%
+
+
 % Ratio superior a 1
 regra 1
 	se [usertype(individual) e avalia(ratio(this_period,>,1))]
@@ -190,10 +193,6 @@ facto(2,temperature(this_period,6)).
 facto(3,wind_speed(this_period,15)).
 
 
-
-%period 1
-%weather data
-
 %production
 facto(4,production(this_period, 2000)).
 
@@ -226,7 +225,108 @@ facto(24,predicted_scarcity(this_period,0)).
 facto(25,want_shift_load(this_period,0)).
 facto(26, battery_ev(this_period,89)).
 facto(27,preco_medio(this_period,0.12)).
-% facto(21, usertype(community))
+
+facto(28, usertype(community))
+
+%%%%%%%%%%%%%%%%%%Community%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+% Ratio superior a 1
+regra 36
+	se [usertype(community) e avalia(community_ratio(this_period,>,1))]
+	entao [cria_facto(community_ratio_more_than_one(this_period,1))].
+
+% Ratio inferior a 1
+regra 37
+	se [usertype(community) e avalia(community_ratio(this_period,<=,1))]
+	entao [cria_facto(community_ratio_less_than_one(this_period,1))].
+
+regra 38
+    se [ community_ratio_more_than_one(this_period,1) e community_predicted_scarcity(this_period,1)]
+	entao [community_check_battery(this_period,1)].
+
+regra 39
+	se [community_check_battery(this_period,1) e avalia(community_battery(this_period,<,50))]
+	entao [cria_facto(charge_community_battery(this_period,1))].
+	
+regra 40 
+	se [community_check_battery(this_period,1) e avalia(community_battery(this_period,>=,50))]
+	entao [cria_facto(check_community_demand(this_period,1))].
+
+regra 41 
+    se [ community_ratio_more_than_one(this_period,1) e community_predicted_scarcity(this_period,0)]
+	entao [cria_facto(check_community_demand(this_period,1))].
+	
+regra 42
+	se [check_community_demand(this_period,1) e community_demand(this_period,1)]
+	entao [cria_facto(sell_to_local_community_market(this_period,1))].
+
+regra 43
+	se [check_community_demand(this_period,1) e community_demand(this_period,0)]
+	entao [cria_facto(check_community_external_market_demand(this_period,1))].
+
+regra 44
+	se [check_community_external_market_demand(this_period,1) e external_market_demand(this_period,1)]
+	entao [cria_facto(sell_to_external_market(this_period,1))].
+	
+regra 45
+	se [check_community_external_market_demand(this_period,1) e external_market_demand(this_period,0)]
+	entao [cria_facto(send_to_the_grid(this_period,":(😢"))].
+	
+regra 46 
+	se [community_ratio_less_than_one(this_period,1) e current_energy_scarcity(this_period,1)]
+	entao [cria_facto(check_community_batteries_charged(this_period,1))].
+
+regra 47
+	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,>=,80)]
+	entao [cria_facto(use_community_battery_energy(this_period,1))].
+	
+regra 48
+	se [community_ratio_less_than_one(this_period,1) e current_energy_scarcity(this_period,0)]
+	entao [cria_facto(check_community_participants_with_surplus(this_period,1))].
+
+regra 49
+	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,<,80)]
+	entao [cria_facto(check_community_participants_with_surplus(this_period,1))].
+	
+regra 50
+	se[check_community_participants_with_surplus(this_period,1) e participant_with_surplus(this_period,1)]
+	entao [cria_facto(should_exchange_energy_between_community_members(this_period,1))].
+
+regra 51 
+	se [participant_with_surplus(this_period,0) e community_predicted_scarcity(this_period,1)]
+	entao [cria_facto(buy_from_external_market(this_period,1))].
+
+regra 52 
+	se [community_predicted_scarcity(this_period,0) e community_expensive_hour(this_period,0)]
+	entao [cria_facto(buy_from_external_market(this_period,1))].
+
+regra 53
+	se [community_predicted_scarcity(this_period,0) e community_expensive_hour(this_period,1)]
+	entao [cria_facto(check_community_battery_suff_charged(this_period,1))].
+	
+regra 54 
+	se [check_community_battery_suff_charged(this_period,1) e avalia(community_battery(this_period,>=,50))]
+	entao [cria_facto(use_community_battery_energy(this_period,1))].
+	
+regra 55
+	se [check_community_battery_suff_charged(this_period,1) e avalia(community_battery(this_period,<,50))]
+	entao [cria_facto(buy_from_external_market(this_period,1))].
+
+
+
+	
+
+	
+	
+	
+
+
+
+
+
 
 
 
