@@ -63,7 +63,7 @@ regra 1
 
 % Ratio inferior a 1
 regra 2
-	se [usertype(individual) e avalia(ratio(this_period,<=,1)) e avalia(ratio(this_period,>,0)]
+	se [usertype(individual) e avalia(ratio(this_period,<=,1)) e avalia(ratio(this_period,>,0))]
 	entao [cria_facto(ratio_less_than_one(this_period,1))].
 
 %Ratio igual a 0
@@ -154,11 +154,11 @@ regra 23
 	entao [print_improvements].
 
 regra 24
-	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=,1)]
+	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=,1))]
 	entao [print_no_operation].
 
 regra 25
-	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=\=,1)]
+	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=\=,1))]
 	entao  [cria_facto(buy_from_cheapest_market(this_period,1))].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[R<0]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -230,8 +230,12 @@ facto(24,predicted_scarcity(this_period,0)).
 facto(25,want_shift_load(this_period,0)).
 facto(26, battery_ev(this_period,89)).
 facto(27,preco_medio(this_period,0.12)).
+facto(28,production_community(this_period, 6000)).
+facto(29,total_consumo_community(this_period, 4000)).
+facto(30,community_battery(this_period, 60)).
 
-facto(28, usertype(community))
+
+% facto(28, usertype(community))
 
 %%%%%%%%%%%%%%%%%%Community%%%%%%%%%%%%%%%%%%%%
 
@@ -285,7 +289,7 @@ regra 43
 	entao [cria_facto(check_community_batteries_charged(this_period,1))].
 
 regra 44
-	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,>=,80)]
+	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,>=,80))]
 	entao [cria_facto(use_community_battery_energy(this_period,1))].
 	
 regra 45
@@ -293,7 +297,7 @@ regra 45
 	entao [cria_facto(check_community_participants_with_surplus(this_period,1))].
 
 regra 46
-	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,<,80)]
+	se[check_community_batteries_charged(this_period,1) e avalia(community_battery(this_period,<,80))]
 	entao [cria_facto(check_community_participants_with_surplus(this_period,1))].
 	
 regra 47
