@@ -29,23 +29,21 @@ calculos:- cria_facto_consumo,
 			ask_actual_price,
 			ask_predicted_scarcity,
 			check_expensive_hour,
-			write('excess'),
 			calcular_excess,
-			write('deficit'),
 			calcular_deficit,
-			write('shift_load'),
+			write('shift load'),
 			shift_load,
 			write('shift load_deficit'),
 			shift_load_deficit(I),
 			write('improvement'),
 			check_r_improvement(I).
 
-cria_facto_consumo:-findall(X,facto(_,device(_,X)),LR),!,calcula_consumo(LR,T),retract(ultimo_facto(N1)),
-	N is N1+1,
+cria_facto_consumo:-findall(X,facto(_,device(_,X)),LR),!,calcula_consumo(LR,T),
 	((call(facto(_,(facto_total_consumo(this_period,T)))),!);
 	(call(facto(F,(facto_total_consumo(this_period,_)))),
 	retract(facto(F,(facto_total_consumo(this_period,_)))),
 	assert(facto(F,(facto_total_consumo(this_period,T)))),!);(
+	retract(ultimo_facto(N1)),N is N1+1,
 	asserta(ultimo_facto(N)),assertz(facto(N,(facto_total_consumo(this_period,T)))))).
 
 calcula_consumo([],0):-!.
@@ -66,22 +64,17 @@ ask_actual_price:-
 ask_predicted_scarcity:-
 	write('PREDICTED ENERGY SCARCITY? 1-YES/ 0-NO (end with .)-> '),
 	read(PS),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(predicted_scarcity(this_period,PS)))),!);
 	(call(facto(F,(predicted_scarcity(this_period,_)))),
 	retract(facto(F,(predicted_scarcity(this_period,_)))),
 	assert(facto(F,(predicted_scarcity(this_period,PS)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)), X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,predicted_scarcity(this_period,PS))))).
 
 check_expensive_hour:-	
-	write('EXP,ok'),
-	retract(ultimo_facto(X1)),
-	write('ultimo facto'),write(X1),
-	facto(_,preco_atual(_,PA)),write(PA),
-	facto(_,preco_medio(_,PM)),write(PM),
-	write('factos ok'),
+	facto(_,preco_atual(_,PA)),
+	facto(_,preco_medio(_,PM)),
 	((call(facto(F,(expensive_hour(this_period,_)))),
 	retract(facto(F,(expensive_hour(this_period,_)))),
 	(PA >= PM ->
@@ -89,41 +82,61 @@ check_expensive_hour:-
 	; (PA < PM ->
 	assert(facto(F,(expensive_hour(this_period,0))))
 	));
-	(PA >= PM ->X is X1+1,
+	(retract(ultimo_facto(X1)),
+	PA >= PM ->X is X1+1,
 	asserta(ultimo_facto(X)),
 	(assertz(facto(X,(expensive_hour(this_period,1)))))
 	; (PA < PM -> X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,(expensive_hour(this_period,0))))))). 
 
-calcular_excess:-retract(ultimo_facto(X1)),
-	X is X1+1,
+calcular_excess:-
 	facto(_,production(_,Prod)),
 	facto(_,facto_total_consumo(_,TotalConsum)),
 	Excess is Prod - TotalConsum,
-	Excess > 0,
+	((Excess > 0,
 	((call(facto(_,(excess(this_period,Excess)))),!);
 	(call(facto(F,(excess(this_period,_)))),
 	retract(facto(F,(excess(this_period,_)))),
 	assert(facto(F,(excess(this_period,Excess)))),!);(
-	asserta(ultimo_facto(X)),
-	assertz(facto(X,(excess(this_period,Excess)))))).
-
-calcular_deficit:-retract(ultimo_facto(X1)),
+	retract(ultimo_facto(X1)),
 	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(excess(this_period,Excess)))))));
+	(Excess =<0,
+		((call(facto(_,(excess(this_period,0)))),!);
+		(call(facto(F,(excess(this_period,_)))),
+		retract(facto(F,(excess(this_period,_)))),
+		assert(facto(F,(excess(this_period,0)))),!);(
+		retract(ultimo_facto(X1)),
+		X is X1+1,
+		asserta(ultimo_facto(X)),
+		assertz(facto(X,(excess(this_period,0)))))))).
+
+calcular_deficit:-
 	facto(_,production(_,Prod)),
 	facto(_,facto_total_consumo(_,TotalConsum)),
 	Deficit is Prod - TotalConsum,
-	Deficit < 0,
+	((Deficit < 0,
 	((call(facto(_,(deficit(this_period,Deficit)))),!);
 	(call(facto(F,(deficit(this_period,_)))),
 	retract(facto(F,(deficit(this_period,_)))),
 	assert(facto(F,(deficit(this_period,Deficit)))),!);
-	(asserta(ultimo_facto(X)),
-	assertz(facto(X,(deficit(this_period,Deficit)))))).
-	
-calcular_ratio:-retract(ultimo_facto(X1)),
+	(retract(ultimo_facto(X1)),
 	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(deficit(this_period,Deficit)))))));
+	(Deficit >= 0,
+	((call(facto(_,(deficit(this_period,0)))),!);
+	(call(facto(F,(deficit(this_period,_)))),
+	retract(facto(F,(deficit(this_period,_)))),
+	assert(facto(F,(deficit(this_period,0)))),!);
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(deficit(this_period,0)))))))).
+	
+calcular_ratio:-
 	facto(_,production(_,Prod)),
 	facto(_,facto_total_consumo(_,TotalConsum)),
 	Ratio is Prod / TotalConsum,
@@ -131,7 +144,9 @@ calcular_ratio:-retract(ultimo_facto(X1)),
 	(call(facto(F,(ratio(this_period,_)))),
 	retract(facto(F,(ratio(this_period,_)))),
 	assert(facto(F,(ratio(this_period,Ratio)))),!);
-	(asserta(ultimo_facto(X)),
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
 	assertz(facto(X,(ratio(this_period,Ratio)))))).
 
 %%%%%%%%%%%%%%%%[INDIVIDUAL - Disconnect Devices using all production]%%%%%%%%%%%%%%%%%%%%
@@ -139,15 +154,19 @@ calcular_ratio:-retract(ultimo_facto(X1)),
 shift_load:-
 	facto(_,(excess(this_period,E))),
 	E>0,
-	combine(E,L1), flatten(L1,L), 
-	retract(ultimo_facto(N1)),
+	combine(E,L1),write('L1'),write(L1), flatten(L1,L), write('L'),write(L),
 	((call(facto(_,(options(this_period,L)))),!);
 	(call(facto(F,(options(this_period,_)))),
 	retract(facto(F,(options(this_period,_)))),
 	assert(facto(F,(options(this_period,L)))),!);
-	(N is N1+1,
+	(retract(ultimo_facto(N1)),
+	N is N1+1,
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(options(this_period,L)))))).
+
+shift_load:-
+	facto(_,(excess(this_period,E))),
+	E=0.
 
 combine(E, LR1):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),checkOneOne(LR,D1,LR1).
 
@@ -163,17 +182,21 @@ devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0))
 
 %%%%%%%%%%%%%%%%[INDIVIDUAL - Essentials]%%%%%%%%%%%%%%%%%%%%
 shift_load_deficit(I):-
-	facto(_,(excess(this_period,E))),
+	facto(_,(deficit(this_period,E))),
 	E<0,
 	combineEssentials(E,L1,I), flatten(L1,L), 
-	retract(ultimo_facto(N1)),
 	((call(facto(_,(load_essential(this_period,L)))),!);
 	(call(facto(F,(load_essential(this_period,_)))),
 	retract(facto(F,(load_essential(this_period,_)))),
 	assert(facto(F,(load_essential(this_period,L)))),!);
-	(N is N1+1,
+	(retract(ultimo_facto(N1)),
+	N is N1+1,
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(load_essential(this_period,L)))))).
+
+shift_load_deficit(I):-
+	facto(_,(excess(this_period,E))),
+	E=0, I is 0.
 
 combineEssentials(E, LR1,I):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,1)),facto(_,essential(N,0))),D),makecombinationsEssentials(D,E,LR,I),not_essentials_devices(D1),checkOneOneEssential(LR,D1,LR1).
 makecombinationsEssentials([], _,[],0).
@@ -187,21 +210,21 @@ checkOneOneEssential(LR,[H|T], [H|L]):-checkOneOneEssential(LR,T,L).
 
 not_essentials_devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,1)), facto(_,essential(N,0))),D).
 
-check_r_improvement(I):-I>0,retract(ultimo_facto(N1)),
+check_r_improvement(I):-I>0,
 	((call(facto(_,(can_improve_r(this_period,1)))),!);
 	(call(facto(F,(can_improve_r(this_period,_)))),
 	retract(facto(F,(can_improve_r(this_period,_)))),
 	assert(facto(F,(can_improve_r(this_period,1)))),!);
-	(N is N1+1,
+	(retract(ultimo_facto(N1)),N is N1+1,
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(can_improve_r(this_period,1)))))).
 
-check_r_improvement(I):-I=0,retract(ultimo_facto(N1)),
+check_r_improvement(I):-I=0,
 	((call(facto(_,(can_improve_r(this_period,0)))),!);
 	(call(facto(F,(can_improve_r(this_period,_)))),
 	retract(facto(F,(can_improve_r(this_period,_)))),
 	assert(facto(F,(can_improve_r(this_period,0)))),!);
-	(N is N1+1,
+	(retract(ultimo_facto(N1)),N is N1+1,
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(can_improve_r(this_period,0)))))).
 
