@@ -50,7 +50,7 @@ facto_dispara_regras(check_community_battery_suff_charged(this_period,_),[51,52]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-ultimo_facto(26).
+ultimo_facto(30).
 ultima_regra(52).
 
 %%%%%%%%%%%%%%%%%%Individual%%%%%%%%%%%%%%%%%%%%

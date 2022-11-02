@@ -22,21 +22,25 @@ carrega_bc:-
 individual:-
 	retract(facto(F,(usertype(_)))),
 	assert(facto(F,(usertype(individual)))),
-	calculos, 
-	arranca_motor.
+	calculos. 
 
 calculos:- cria_facto_consumo,
 			calcular_ratio,
 			ask_actual_price,
 			ask_predicted_scarcity,
 			check_expensive_hour,
+			write('excess'),
 			calcular_excess,
+			write('deficit'),
 			calcular_deficit,
+			write('shift_load'),
 			shift_load,
+			write('shift load_deficit'),
 			shift_load_deficit(I),
+			write('improvement'),
 			check_r_improvement(I).
 
-cria_facto_consumo:-findall(X,facto(_,device(_,X)),LR),write(LR),!,calcula_consumo(LR,T),write(T),retract(ultimo_facto(N1)),write(N1),
+cria_facto_consumo:-findall(X,facto(_,device(_,X)),LR),!,calcula_consumo(LR,T),retract(ultimo_facto(N1)),
 	N is N1+1,
 	((call(facto(_,(facto_total_consumo(this_period,T)))),!);
 	(call(facto(F,(facto_total_consumo(this_period,_)))),
@@ -71,9 +75,13 @@ ask_predicted_scarcity:-
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,predicted_scarcity(this_period,PS))))).
 
-check_expensive_hour:-retract(ultimo_facto(X1)),
-	facto(_,preco_atual(_,PA)),
-	facto(_,preco_medio(_,PM)),
+check_expensive_hour:-	
+	write('EXP,ok'),
+	retract(ultimo_facto(X1)),
+	write('ultimo facto'),write(X1),
+	facto(_,preco_atual(_,PA)),write(PA),
+	facto(_,preco_medio(_,PM)),write(PM),
+	write('factos ok'),
 	((call(facto(F,(expensive_hour(this_period,_)))),
 	retract(facto(F,(expensive_hour(this_period,_)))),
 	(PA >= PM ->
@@ -81,10 +89,10 @@ check_expensive_hour:-retract(ultimo_facto(X1)),
 	; (PA < PM ->
 	assert(facto(F,(expensive_hour(this_period,0))))
 	));
-	(PA >= PM ->
+	(PA >= PM ->X is X1+1,
 	asserta(ultimo_facto(X)),
 	(assertz(facto(X,(expensive_hour(this_period,1)))))
-	; (PA < PM -> 
+	; (PA < PM -> X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,(expensive_hour(this_period,0))))))). 
 
@@ -141,7 +149,7 @@ shift_load:-
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(options(this_period,L)))))).
 
-combine(E, LR):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOne(LR,D1,LR1).
+combine(E, LR1):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),checkOneOne(LR,D1,LR1).
 
 makecombinations([], _,[]).
 makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
@@ -167,7 +175,7 @@ shift_load_deficit(I):-
 	asserta(ultimo_facto(N)),
 	assertz(facto(N,(load_essential(this_period,L)))))).
 
-combineEssentials(E, LR,I):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,1)),facto(_,essential(N,0))),D),makecombinationsEssentials(D,E,LR,I),not_essentials_devices(D1),write('LR'), write(LR), write('D1'),write(D1),checkOneOneEssential(LR,D1,LR1).
+combineEssentials(E, LR1,I):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,1)),facto(_,essential(N,0))),D),makecombinationsEssentials(D,E,LR,I),not_essentials_devices(D1),checkOneOneEssential(LR,D1,LR1).
 makecombinationsEssentials([], _,[],0).
 makecombinationsEssentials([H|T], E,[R|X],I):-E1 is E, combinationsE([H|T],E1,R,I1), makecombinationsEssentials(T,E,X,I2),I is I1+I2.
 combinationsE(_,0, [],1):-!.
