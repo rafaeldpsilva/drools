@@ -3,8 +3,7 @@ package org.engcia.sample;
 //import org.drools.core.rule.builder.dialect.asm.ClassGenerator;
 
 import org.engcia.fuzzy.FuzzyLogic;
-import org.engcia.model.Conclusion;
-import org.engcia.model.Justification;
+import org.engcia.model.*;
 import org.engcia.view.UI;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -14,6 +13,7 @@ import org.kie.api.runtime.rule.Row;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,6 +31,33 @@ public class DroolsTest {
         UI.uiInit();
         runEngine();
         UI.uiClose();
+    }
+
+    private static void bootstrap(KieSession kieSession) {
+        ArrayList<Device> devices = new ArrayList<>();
+
+        Device kettle = new Device("kettle", 15, false, false);
+        devices.add(kettle);
+        Device washingMachine = new Device("washing machine", 15, false, true);
+        devices.add(washingMachine);
+        Device fridge = new Device("fridge", 30, true, true);
+        devices.add(fridge);
+        Device ac = new Device("ac", 40, true, true);
+        devices.add(ac);
+        Device aird = new Device("aird", 15, false, false);
+        devices.add(aird);
+
+        Participant participant = new Participant("1",100,devices);
+        kieSession.setGlobal("participantId", participant.getId());
+
+        int threshold = FuzzyLogic.fuzzify(12,300);
+        Battery ev = new Battery(50,10,threshold);
+
+        Pricing p = new Pricing(1000.0);
+
+        kieSession.insert(participant);
+        kieSession.insert(ev);
+        kieSession.insert(p);
     }
 
     private static void runEngine() {
@@ -73,6 +100,8 @@ public class DroolsTest {
             };
 
             LiveQuery query = kSession.openLiveQuery("Conclusions", null, listener);
+
+            bootstrap(kSession);
 
             kSession.fireAllRules();
             kSession.dispose();

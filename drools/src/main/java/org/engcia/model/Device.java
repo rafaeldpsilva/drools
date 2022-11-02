@@ -45,7 +45,7 @@ public class Device {
     }
 
 
-    public boolean isState() {
+    public boolean isOn() {
         return state;
     }
 
