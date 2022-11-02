@@ -28,6 +28,7 @@ calculos:- cria_facto_consumo,
 			calcular_ratio,
 			ask_actual_price,
 			ask_predicted_scarcity,
+			ask_wants_to_shift_load,
 			check_expensive_hour,
 			calcular_excess,
 			calcular_deficit,
@@ -71,6 +72,19 @@ ask_predicted_scarcity:-
 	(retract(ultimo_facto(X1)), X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,predicted_scarcity(this_period,PS))))).
+	
+ask_wants_to_shift_load:-
+	write('WILL YOU WANT TO SHIFT LOAD? 1-YES/ 0-NO (end with .)-> '),
+	read(SL),
+	((call(facto(_,(want_shift_load(this_period,SL)))),!);
+	(call(facto(F,(want_shift_load(this_period,_)))),
+	retract(facto(F,(want_shift_load(this_period,_)))),
+	assert(facto(F,(want_shift_load(this_period,SL)))),!);
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,want_shift_load(this_period,SL))))).
+	
 
 check_expensive_hour:-	
 	facto(_,preco_atual(_,PA)),
@@ -150,6 +164,20 @@ calcular_ratio:-
 	assertz(facto(X,(ratio(this_period,Ratio)))))).
 
 %%%%%%%%%%%%%%%%[INDIVIDUAL - Disconnect Devices using all production]%%%%%%%%%%%%%%%%%%%%
+combine(E, LR1):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(E,D1),checkOneOne(LR,D1,LR1),!.
+
+makecombinations([], _,[]).
+makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
+combinations(_,0, []):-!.
+combinations([],_, []):-!.
+combinations([device(_,X)|T],E, R):-E>0, E1 is E-X, E1<0, combinations(T,E1,R).
+combinations([device(N,X)|T],E, [device(N,X)|R]):-E>0, E1 is E-X, E1>=0, combinations(T,E1,R).
+checkOneOne(LR,[], LR):-!.
+checkOneOne(LR,[H|T],L):-member(H,LR),checkOneOne(LR,T,L).
+checkOneOne(LR,[H|T], [H|L]):-checkOneOne(LR,T,L).
+devices(E,D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0)), C=<E),D).
+
+
 
 shift_load:-
 	facto(_,(excess(this_period,E))),
@@ -168,17 +196,7 @@ shift_load:-
 	facto(_,(excess(this_period,E))),
 	E=0.
 
-combine(E, LR1):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,0))),D),makecombinations(D,E,LR),devices(D1),checkOneOne(LR,D1,LR1).
 
-makecombinations([], _,[]).
-makecombinations([H|T], E,[R|X]):-E1 is E, combinations([H|T],E1,R), makecombinations(T,E,X).
-combinations(_,0, []):-!.
-combinations([],_, []):-!.
-combinations([device(N,X)|T],E, [device(N,X)|R]):-E>0, E1 is E-X, E1>=0, combinations(T,E1,R).
-checkOneOne(LR,[], LR):-!.
-checkOneOne(LR,[H|T],L):-member(H,LR),checkOneOne(LR,T,L).
-checkOneOne(LR,[H|T], [H|L]):-checkOneOne(LR,T,L).
-devices(D):-findall([device(N,C)],(facto(_,device(N,C)), facto(_,connected(N,0))),D).
 
 %%%%%%%%%%%%%%%%[INDIVIDUAL - Essentials]%%%%%%%%%%%%%%%%%%%%
 shift_load_deficit(I):-
@@ -195,7 +213,7 @@ shift_load_deficit(I):-
 	assertz(facto(N,(load_essential(this_period,L)))))).
 
 shift_load_deficit(I):-
-	facto(_,(excess(this_period,E))),
+	facto(_,(deficit(this_period,E))),
 	E=0, I is 0.
 
 combineEssentials(E, LR1,I):-findall(device(N,C),(facto(_,device(N,C)), facto(_,connected(N,1)),facto(_,essential(N,0))),D),makecombinationsEssentials(D,E,LR,I),not_essentials_devices(D1),checkOneOneEssential(LR,D1,LR1).
@@ -247,9 +265,8 @@ print_improvements:-
 community:-
 	retract(facto(F,(usertype(_)))),
 	assert(facto(F,(usertype(community)))),
-	community_system,
-	arranca_motor.
-
+	community_system.
+	
 community_system:-predicted_scarcity_community,
 				calculate_current_energy_scarcity,
 				calcular_ratio_community,
