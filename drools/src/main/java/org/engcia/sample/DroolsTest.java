@@ -51,12 +51,17 @@ public class DroolsTest {
         Participant participant = new Participant("1",100,devices);
         kieSession.setGlobal("participantId", participant.getId());
 
-        int threshold = FuzzyLogic.fuzzify(12,300);
-        Battery ev = new Battery(50,10,threshold);
+        Weather weather = new Weather(30.0, 300.0, 12.0);
+        int threshold = FuzzyLogic.fuzzify(weather.getWindSpeedKMH().intValue(),weather.getSolarRadiationWattsM2().intValue());
+        weather.setPredictedEnergyScarcity(threshold);
+
+        Battery ev = new Battery(30,10);
+        //participant.setEv(ev);
 
         Pricing p = new Pricing(1000.0);
 
         kieSession.insert(participant);
+        kieSession.insert(weather);
         kieSession.insert(ev);
         kieSession.insert(p);
     }
@@ -118,9 +123,10 @@ public class DroolsTest {
     public static void chooseDevicesTurnOn(Participant participant){
         System.out.println("You can turn on these devices:");
 
-        for(int i = 0; i<participant.getDevices().size(); i++){
+        for(int i = 0; i < participant.getDevices().size(); i++){
             Device dev = participant.getDevices().get(i);
-            System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
+            if(!dev.isOn())
+                System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
         }
         Scanner sc = new Scanner(System.in);
         System.out.println("Which one do you want to turn on?");
@@ -134,7 +140,8 @@ public class DroolsTest {
 
         for(int i = 0; i<participant.getDevices().size(); i++){
             Device dev = participant.getDevices().get(i);
-            System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
+            if(dev.isOn())
+                System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
         }
         Scanner sc = new Scanner(System.in);
         System.out.println("Which one do you want to turn off?");
