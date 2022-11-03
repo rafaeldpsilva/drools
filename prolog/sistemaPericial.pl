@@ -20,8 +20,8 @@ carrega_bc:-
 %%%%%%%%%%%%%%%%%%[Individual]%%%%%%%%%%%%%%%%%%%%
 
 individual:-
-	retract(facto(F,(usertype(_)))),
-	assert(facto(F,(usertype(individual)))),
+	retract(facto(F,(usertype(_,_)))),
+	assert(facto(F,(usertype(this_period,individual)))),
 	calculos. 
 
 calculos:- cria_facto_consumo,
@@ -53,12 +53,12 @@ calcula_consumo([H|T],R):-calcula_consumo(T,R1), R is H + R1.
 ask_actual_price:-
 	write('ACTUAL ENERGY PRICE eur/kWh (end with .)-> '),
 	read(PA),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(preco_atual(this_period,PA)))),!);
 	(call(facto(F,(preco_atual(this_period,_)))),
 	retract(facto(F,(preco_atual(this_period,_)))),
 	assert(facto(F,(preco_atual(this_period,PA)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,preco_atual(this_period,PA))))).
 
@@ -91,24 +91,24 @@ check_expensive_hour:-
 	facto(_,preco_medio(_,PM)),
 	((call(facto(F,(expensive_hour(this_period,_)))),
 	retract(facto(F,(expensive_hour(this_period,_)))),
-	(PA >= PM ->
+	((PA >= PM ->
 	assert(facto(F,(expensive_hour(this_period,1)))))
 	; (PA < PM ->
 	assert(facto(F,(expensive_hour(this_period,0))))
-	));
+	)));
 	(retract(ultimo_facto(X1)),
-	PA >= PM ->X is X1+1,
+	((PA >= PM ->X is X1+1,
 	asserta(ultimo_facto(X)),
-	(assertz(facto(X,(expensive_hour(this_period,1)))))
+	assertz(facto(X,(expensive_hour(this_period,1)))))
 	; (PA < PM -> X is X1+1,
 	asserta(ultimo_facto(X)),
-	assertz(facto(X,(expensive_hour(this_period,0))))))). 
+	assertz(facto(X,(expensive_hour(this_period,0)))))))). 
 
 calcular_excess:-
 	facto(_,production(_,Prod)),
 	facto(_,facto_total_consumo(_,TotalConsum)),
 	Excess is Prod - TotalConsum,
-	((Excess > 0,
+	Excess > 0,
 	((call(facto(_,(excess(this_period,Excess)))),!);
 	(call(facto(F,(excess(this_period,_)))),
 	retract(facto(F,(excess(this_period,_)))),
@@ -116,16 +116,21 @@ calcular_excess:-
 	retract(ultimo_facto(X1)),
 	X is X1+1,
 	asserta(ultimo_facto(X)),
-	assertz(facto(X,(excess(this_period,Excess)))))));
-	(Excess =<0,
-		((call(facto(_,(excess(this_period,0)))),!);
-		(call(facto(F,(excess(this_period,_)))),
-		retract(facto(F,(excess(this_period,_)))),
-		assert(facto(F,(excess(this_period,0)))),!);(
-		retract(ultimo_facto(X1)),
-		X is X1+1,
-		asserta(ultimo_facto(X)),
-		assertz(facto(X,(excess(this_period,0)))))))).
+	assertz(facto(X,(excess(this_period,Excess)))))).
+	
+calcular_excess:-
+    facto(_,production(_,Prod)),
+	facto(_,facto_total_consumo(_,TotalConsum)),
+	Excess is Prod - TotalConsum,
+    Excess =<0,
+	((call(facto(_,(excess(this_period,0)))),!);
+	(call(facto(F,(excess(this_period,_)))),
+	retract(facto(F,(excess(this_period,_)))),
+	assert(facto(F,(excess(this_period,0)))),!);(
+	retract(ultimo_facto(X1)),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
+	assertz(facto(X,(excess(this_period,0)))))).
 
 calcular_deficit:-
 	facto(_,production(_,Prod)),
@@ -263,8 +268,8 @@ print_improvements:-
 %%%%%%%%%%%%%%%%%%[Community]%%%%%%%%%%%%%%%%%%%%
 
 community:-
-	retract(facto(F,(usertype(_)))),
-	assert(facto(F,(usertype(community)))),
+	retract(facto(F,(usertype(_,_)))),
+	assert(facto(F,(usertype(this_period,community)))),
 	community_system.
 	
 community_system:-predicted_scarcity_community,
@@ -279,12 +284,12 @@ community_system:-predicted_scarcity_community,
 predicted_scarcity_community:-
 	write('PREDICTED ENERGY SCARCITY IN THE COMMUNITY? 1-YES/ 0-NO (end with .)-> '),
 	read(PS),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(community_predicted_scarcity(this_period,PS)))),!);
 	(call(facto(F,(community_predicted_scarcity(this_period,_)))),
 	retract(facto(F,(community_predicted_scarcity(this_period,_)))),
 	assert(facto(F,(community_predicted_scarcity(this_period,PS)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,community_predicted_scarcity(this_period,PS))))).
 
@@ -293,12 +298,12 @@ calculate_current_energy_scarcity:-
 	facto(_, temperature(_,T)),
 	facto(_,wind_speed(_,W)),
 	checkCurrentScarcity(SR,W,T,R),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(current_energy_scarcity(this_period,R)))),!);
 	(call(facto(F,(current_energy_scarcity(this_period,_)))),
 	retract(facto(F,(current_energy_scarcity(this_period,_)))),
 	assert(facto(F,(current_energy_scarcity(this_period,R)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,current_energy_scarcity(this_period,R))))).
 
@@ -312,20 +317,18 @@ checkCurrentScarcity(SR,W,T,R):-
 ask_community_demand:-
 	write('ANY COMMUNITY DEMAND? 1-YES/ 0-NO (end with .)-> '),
 	read(CD),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(community_demand(this_period,CD)))),!);
 	(call(facto(F,(community_demand(this_period,_)))),
 	retract(facto(F,(community_demand(this_period,_)))),
 	assert(facto(F,(community_demand(this_period,CD)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,community_demand(this_period,CD))))).
 
 
 calcular_ratio_community:-
-	retract(ultimo_facto(X1)),
-	
-	X is X1+1,
+
 	facto(_,production_community(_,Prod)),
 	facto(_,total_consumo_community(_,TotalConsum)),
 	Ratio is Prod / TotalConsum,
@@ -333,18 +336,20 @@ calcular_ratio_community:-
 	(call(facto(F,(community_ratio(this_period,_)))),
 	retract(facto(F,(community_ratio(this_period,_)))),
 	assert(facto(F,(community_ratio(this_period,Ratio)))),!);
-	(asserta(ultimo_facto(X)),
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
+	asserta(ultimo_facto(X)),
 	assertz(facto(X,(ratio(community_ratio,Ratio)))))).
 
 ask_expensive_hour:-
 	write('ARE WE IN THE EXPENSIVE HOUR? 1-YES/ 0-NO (end with .)-> '),
 	read(EH),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(community_expensive_hour(this_period,EH)))),!);
 	(call(facto(F,(community_expensive_hour(this_period,_)))),
 	retract(facto(F,(community_expensive_hour(this_period,_)))),
 	assert(facto(F,(community_expensive_hour(this_period,EH)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X,community_expensive_hour(this_period,EH))))).
 
@@ -352,12 +357,12 @@ ask_expensive_hour:-
 ask_external_market_demand:-
 	write('ANY EXTERNAL MARKET DEMAND? 1-YES/ 0-NO (end with .)-> '),
 	read(EM),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(external_market_demand(this_period,EM)))),!);
 	(call(facto(F,(external_market_demand(this_period,_)))),
 	retract(facto(F,(external_market_demand(this_period,_)))),
 	assert(facto(F,(external_market_demand(this_period,EM)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X)),
 	assertz(facto(X,external_market_demand(this_period,EM))))).
@@ -365,17 +370,17 @@ ask_external_market_demand:-
 ask_participants_surplus:-
 	write('ANY PARTICIPANT WITH SURPLUS? 1-YES/ 0-NO (end with .)-> '),
 	read(PS),
-	retract(ultimo_facto(X1)),
 	((call(facto(_,(participant_with_surplus(this_period,PS)))),!);
 	(call(facto(F,(participant_with_surplus(this_period,_)))),
 	retract(facto(F,(participant_with_surplus(this_period,_)))),
 	assert(facto(F,(participant_with_surplus(this_period,PS)))),!);
-	(X is X1+1,
+	(retract(ultimo_facto(X1)),
+	X is X1+1,
 	asserta(ultimo_facto(X)),
 	assertz(facto(X)),
 	assertz(facto(X,participant_with_surplus(this_period,PS))))).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%[MOTOR]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%[MOTOR-🚗]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 arranca_motor:-
 	facto(N,Facto),
