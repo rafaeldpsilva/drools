@@ -110,7 +110,7 @@ regra 12
 
 regra 13
 	se [shift_load_options(this_period,1) e options(this_period, OP)]
-	entao [print_options(OP)].
+	entao [cria_facto(options_to_shift_load(this_period,OP))].
 
 regra 14
 	se[ratio_more_than_one(this_period,1) e predicted_scarcity(this_period,1) e has_EV(this_period,0)]
@@ -151,11 +151,11 @@ regra 22
 	
 regra 23
 	se [r_improvement(this_period,1) e can_improve_r(this_period,1)]
-	entao [print_improvements].
+	entao [cria_facto(run_improvement(this_period,print_improvements))].
 
 regra 24
 	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=,1))]
-	entao [print_no_operation].
+	entao [cria_facto(run_no_operation(this_period,print_no_operation))].
 
 regra 25
 	se [r_improvement(this_period,1) e can_improve_r(this_period,0) e avalia(ratio(this_period,=\=,1))]
@@ -190,7 +190,6 @@ regra 31
 regra 32
 	se[ratio_equals_zero(this_period,1) e has_EV(this_period,0) ]
 	entao [cria_facto(check_expensive_hour_r_equals_zero(this_period,1))].
-
 
 
 facto(1,solar_radiation(this_period,112)).
