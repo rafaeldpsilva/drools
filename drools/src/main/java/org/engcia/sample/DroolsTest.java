@@ -15,6 +15,7 @@ import org.kie.api.runtime.rule.ViewChangedEventListener;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 
@@ -112,5 +113,34 @@ public class DroolsTest {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    public static void chooseDevicesTurnOn(Participant participant){
+        System.out.println("You can turn on these devices:");
+
+        for(int i = 0; i<participant.getDevices().size(); i++){
+            Device dev = participant.getDevices().get(i);
+            System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Which one do you want to turn on?");
+        int devi = sc.nextInt();
+
+        Device dev = participant.getDevices().get(devi);
+        dev.turnOn();
+    }
+    public static void chooseDevicesTurnOff(Participant participant){
+        System.out.println("You can turn off these devices:");
+
+        for(int i = 0; i<participant.getDevices().size(); i++){
+            Device dev = participant.getDevices().get(i);
+            System.out.printf("%d - %s (%.2f)\n", i, dev.getName(), participant.getProduction()/(participant.getConsumption()+ dev.getConsumption()));
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Which one do you want to turn off?");
+        int devi = sc.nextInt();
+
+        Device dev = participant.getDevices().get(devi);
+        dev.turnOff();
     }
 }

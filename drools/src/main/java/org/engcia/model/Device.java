@@ -53,6 +53,14 @@ public class Device {
         this.state = state;
     }
 
+    public void turnOn() {
+        this.state = true;
+    }
+
+    public void turnOff() {
+        this.state = false;
+    }
+
     @Override
     public String toString() {
         return "Device{" +

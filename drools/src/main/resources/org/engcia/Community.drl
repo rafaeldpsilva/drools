@@ -10,6 +10,8 @@ import org.engcia.model.Participant;
 
 import function org.engcia.view.UI.answer;
 
+import function org.engcia.sample.DroolsTest.chooseDevicesTurnOn;
+
 import function org.engcia.fuzzy.FuzzyLogic.fuzzify;
 
 query "Conclusions"
@@ -407,15 +409,7 @@ rule "R10: R>1 and Not Predicted Energy Scarcity and Wants to shift load -> Shif
         eval(answer("Wants to shift load", "yes"))
         $p : Participant(id == participantId)
     then
-        System.out.println("You can turn on these devices:");
-        for(int i = 0; i<$p.getDevices().size(); i++){
-            System.out.println($p.getDevices().get(i));
-
-
-        }
-
-
-
+        chooseDevicesTurnOn($p);
         Conclusion c = new Conclusion(Conclusion.SHIFT_LOAD);
         insert(c);
 
