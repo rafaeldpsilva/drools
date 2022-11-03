@@ -24,7 +24,7 @@ public class FuzzyLogic {
         }
 
         // Show
-        JFuzzyChart.get().chart(fis);
+        //JFuzzyChart.get().chart(fis);
 
         // Set inputs////########################################
         fis.setVariable("wind_power", windPower);//wind power
@@ -35,7 +35,7 @@ public class FuzzyLogic {
 
         // Show output variable's chart
         Variable energy_scarcity = fis.getVariable("energy_scarcity");
-        JFuzzyChart.get().chart(energy_scarcity, energy_scarcity.getDefuzzifier(), true);
+        JFuzzyChart.get().chart(energy_scarcity, energy_scarcity.getDefuzzifier(), false);
         double output = energy_scarcity.defuzzify();
         String PES = "";
         // Show output variable value
