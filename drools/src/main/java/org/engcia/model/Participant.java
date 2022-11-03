@@ -56,6 +56,28 @@ public class Participant {
         return devices;
     }
 
+    public void setEv(Battery ev){
+        this.ev = ev;
+    }
+
+    public Battery getEv() {
+        return ev;
+    }
+
+    public boolean hasEv(){
+        return this.ev != null;
+    }
+
+    public boolean isEvSufficientlyCharged(){
+        if (this.ev != null)
+            return this.ev.isSufficientlyCharged();
+        return false;
+    }
+
+    public void setEvThreshold(double threshold){
+        if(this.ev != null)
+            this.ev.setThreshold(threshold);
+    }
     public void setProduction(double production) {
         this.production = production;
     }

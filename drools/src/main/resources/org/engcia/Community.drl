@@ -7,6 +7,7 @@ import org.engcia.model.Fact;
 
 import org.engcia.model.Device;
 import org.engcia.model.Participant;
+import org.engcia.model.Weather;
 
 import function org.engcia.view.UI.answer;
 
@@ -318,8 +319,12 @@ rule "R2: R>1 and Predicted Energy Scarcity"
     when
         Hypothesis(description == "manager", value == "false")
         Hypothesis(description == "R>1", value == "true")
-        eval(answer("Predicted Energy Scarcity", "yes"))
+        $w : Weather(evaluatePredictedEnergyScarcity())
+        $p : Participant(id == participantId)
     then
+        System.out.println("R2 - R>1 and Predicted Energy Scarcity");
+        $p.setEvThreshold($w.getThreshold());
+        update($p);
         Hypothesis h = new Hypothesis("Predicted Energy Scarcity", "true");
         insert(h);
 end
@@ -328,8 +333,11 @@ rule "R3: R>1 and Not Predicted Energy Scarcity"
     when
         Hypothesis(description == "manager", value == "false")
         Hypothesis(description == "R>1", value == "true")
-        eval(answer("Predicted Energy Scarcity", "no"))
+        $w : Weather(!evaluatePredictedEnergyScarcity())
+        $p : Participant(id == participantId)
     then
+        System.out.println("R3 - R>1 and Not Predicted Energy Scarcity");
+        $p.setEvThreshold($w.getThreshold());
         Hypothesis h = new Hypothesis("Predicted Energy Scarcity", "false");
         insert(h);
 end
@@ -363,8 +371,9 @@ rule "R6: R>1 and Has EV and Sufficiently Charged Battery -> Sell to the communi
         Hypothesis(description == "manager", value == "false")
         Hypothesis(description == "R>1", value == "true")
         Hypothesis(description == "Has EV", value == "true")
-        eval(answer("Sufficiently Charged Battery", "yes"))
+        $p : Participant(id == participantId, isEvSufficientlyCharged() != false)
     then
+        System.out.println("R6 - R>1 and Has EV and Sufficiently Charged Battery -> Sell to the community market");
         Conclusion c = new Conclusion(Conclusion.SELL_COMMUNITY_MARKET);
         insert(c);
 end
@@ -374,8 +383,9 @@ rule "R7: R>1 and Has EV and Not Sufficiently Charged Battery"
         Hypothesis(description == "manager", value == "false")
         Hypothesis(description == "R>1", value == "true")
         Hypothesis(description == "Has EV", value == "true")
-        eval(answer("Sufficiently Charged Battery", "no"))
+        $p : Participant(id == participantId, isEvSufficientlyCharged() == false)
     then
+        System.out.println("R7 - R>1 and Has EV and Not Sufficiently Charged Battery");
         Hypothesis h = new Hypothesis("Sufficiently Charged Battery", "false");
         insert(h);
 end
