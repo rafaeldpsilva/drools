@@ -4,12 +4,16 @@ public class Battery {
 
     private double currentCharge;
     private double minimalCharge;
-    private double securityCharge;
+    private double threshold;
 
-    public Battery(double currentCharge, double minimalCharge, double securityCharge) {
+    public Battery(double currentCharge, double minimalCharge) {
         this.currentCharge = currentCharge;
         this.minimalCharge = minimalCharge;
-        this.securityCharge = securityCharge;
+    }
+    public Battery(double currentCharge, double minimalCharge, double threshold) {
+        this.currentCharge = currentCharge;
+        this.minimalCharge = minimalCharge;
+        this.threshold = threshold;
     }
 
     public double getCurrentCharge() {
@@ -28,15 +32,15 @@ public class Battery {
         this.minimalCharge = minimalCharge;
     }
 
-    public double getSecurityCharge() {
-        return securityCharge;
+    public double getThreshold() {
+        return this.threshold;
     }
 
-    public void setSecurityCharge(double securityCharge) {
-        this.securityCharge = securityCharge;
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
     }
 
     public boolean isSufficientlyCharged(){
-        return this.currentCharge >= 0.7;
+        return this.currentCharge >= this.threshold;
     }
 }
