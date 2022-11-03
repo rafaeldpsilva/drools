@@ -45,12 +45,20 @@ public class Device {
     }
 
 
-    public boolean isState() {
+    public boolean isOn() {
         return state;
     }
 
     public void setState(boolean state) {
         this.state = state;
+    }
+
+    public void turnOn() {
+        this.state = true;
+    }
+
+    public void turnOff() {
+        this.state = false;
     }
 
     @Override

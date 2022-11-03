@@ -10,11 +10,17 @@ public class Participant {
     private ParticipantType participantType;
     private List<Device> devices;
 
-    public Participant(String id, double production, double consumption, List<Device> devices) {
+    public Participant(String id, double production, List<Device> devices) {
         this.id = id;
         this.production = production;
-        this.consumption = consumption;
         this.devices = devices;
+
+        this.consumption = 0;
+        for (Device device: devices) {
+            if(device.isOn()){
+                this.consumption+=device.getConsumption();
+            }
+        }
 
         if(production>0 && consumption>0){
             this.participantType=ParticipantType.PROSUMER;

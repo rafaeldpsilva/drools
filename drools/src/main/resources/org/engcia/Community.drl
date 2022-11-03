@@ -5,13 +5,20 @@ import org.engcia.model.Hypothesis;
 import org.engcia.model.Conclusion;
 import org.engcia.model.Fact;
 
+import org.engcia.model.Device;
+import org.engcia.model.Participant;
+
 import function org.engcia.view.UI.answer;
+
+import function org.engcia.sample.DroolsTest.chooseDevicesTurnOn;
 
 import function org.engcia.fuzzy.FuzzyLogic.fuzzify;
 
 query "Conclusions"
-    $conclusions : Conclusion()
+    $conclusion : Conclusion()
 end
+
+global java.lang.String participantId;
 
 rule "R0: Is Manager"
     when
@@ -400,9 +407,12 @@ rule "R10: R>1 and Not Predicted Energy Scarcity and Wants to shift load -> Shif
         Hypothesis(description == "R>1", value == "true")
         Hypothesis(description == "Predicted Energy Scarcity", value == "false")
         eval(answer("Wants to shift load", "yes"))
+        $p : Participant(id == participantId)
     then
+        chooseDevicesTurnOn($p);
         Conclusion c = new Conclusion(Conclusion.SHIFT_LOAD);
         insert(c);
+
 end
 
 rule "R11: R>1 and Not Predicted Energy Scarcity and Not Wants to shift load"
