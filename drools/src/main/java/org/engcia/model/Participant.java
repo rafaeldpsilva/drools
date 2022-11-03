@@ -9,6 +9,7 @@ public class Participant {
     private double consumption;
     private ParticipantType participantType;
     private List<Device> devices;
+    private Battery ev;
 
     public Participant(String id, double production, List<Device> devices) {
         this.id = id;
@@ -43,6 +44,10 @@ public class Participant {
         return consumption;
     }
 
+    public double getRatio(){
+        return this.production/this.consumption;
+    }
+
     public ParticipantType getParticipantType() {
         return participantType;
     }
@@ -62,10 +67,4 @@ public class Participant {
     public void setDevices(List<Device> devices) {
         this.devices = devices;
     }
-
-    public double getRatio(){
-        return this.production/this.consumption;
-    }
-
-
 }
